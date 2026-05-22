@@ -1,0 +1,13 @@
+#!/bin/sh
+# freshdocs documentation gate (pre-commit).
+# Install into a consuming repo with:  freshdocs-install-hook   (or copy to .git/hooks/pre-commit)
+# Blocks the commit when staged code drifts from an agent-facing doc.
+
+if command -v doc-gate >/dev/null 2>&1; then
+  exec doc-gate
+elif [ -x "node_modules/.bin/doc-gate" ]; then
+  exec node_modules/.bin/doc-gate
+else
+  echo "freshdocs: doc-gate not found on PATH or in node_modules/.bin; skipping gate" >&2
+  exit 0
+fi

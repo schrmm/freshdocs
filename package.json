@@ -1,0 +1,28 @@
+{
+  "name": "freshdocs",
+  "version": "0.0.1",
+  "description": "Keep project documentation reflecting the current state of the codebase",
+  "type": "module",
+  "bin": {
+    "doc-gate": "dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "node --import tsx --test \"test/**/*.test.ts\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/picomatch": "^4.0.3",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  },
+  "dependencies": {
+    "picomatch": "^4.0.4",
+    "yaml": "^2.9.0"
+  }
+}
