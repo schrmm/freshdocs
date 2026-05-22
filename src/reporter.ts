@@ -13,7 +13,7 @@ const MARKER: Record<Finding["severity"], string> = {
 /** Render findings to gate output and decide the exit code (fail → nonzero). */
 export function formatReport(findings: Finding[]): Report {
   if (findings.length === 0) {
-    return { exitCode: 0, output: "freshdocs: no documentation drift detected." };
+    return { exitCode: 0, output: "freshdocs: docs up to date — no issues detected." };
   }
 
   const lines = findings.map(
@@ -23,6 +23,6 @@ export function formatReport(findings: Finding[]): Report {
 
   return {
     exitCode: hasFailure ? 1 : 0,
-    output: ["freshdocs: documentation drift detected", ...lines].join("\n"),
+    output: ["freshdocs: documentation issues detected", ...lines].join("\n"),
   };
 }
