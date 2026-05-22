@@ -39,3 +39,44 @@ test("runGate passes (exit 0) when the doc is updated alongside the code", () =>
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test("runGate fails when a changed doc has a broken internal link", () => {
+  const root = fixture({
+    "docs/a.md": "see [gone](./missing.md)",
+    "docs/b.md": "ok",
+  });
+  try {
+    const { exitCode, output } = runGate(root, ["docs/a.md"]);
+    assert.equal(exitCode, 1);
+    assert.match(output, /missing\.md/);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("runGate passes when a changed doc's internal links resolve", () => {
+  const root = fixture({
+    "docs/a.md": "see [b](./b.md)",
+    "docs/b.md": "# B",
+  });
+  try {
+    const { exitCode } = runGate(root, ["docs/a.md"]);
+    assert.equal(exitCode, 0);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("runGate only link-checks changed docs, not untouched ones", () => {
+  const root = fixture({
+    "docs/a.md": "[gone](./missing.md)",
+    "docs/b.md": "ok",
+  });
+  try {
+    // commit touches b.md only; a.md's broken link must not be reported
+    const { exitCode } = runGate(root, ["docs/b.md"]);
+    assert.equal(exitCode, 0);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
