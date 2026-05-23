@@ -4,7 +4,8 @@
   "description": "Keep project documentation reflecting the current state of the codebase",
   "type": "module",
   "bin": {
-    "doc-gate": "dist/cli.js"
+    "doc-gate": "dist/cli.js",
+    "freshdocs-audit": "dist/audit-cli.js"
   },
   "files": [
     "dist"

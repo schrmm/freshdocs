@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 import { execFileSync } from "node:child_process";
 import { readdirSync, readFileSync } from "node:fs";
-import { join, sep } from "node:path";
+import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { buildIndex } from "./docmeta-index.ts";
 import { detect } from "./detect-engine.ts";
 import { checkInternalLinks, type DocFile } from "./link-checker.ts";
 import { formatReport, type Report } from "./reporter.ts";
+import { IGNORED_DIRS, listFiles } from "./repo-files.ts";
 import {
   computeFingerprint,
   diffFingerprints,
@@ -69,25 +70,6 @@ function readHeadShape(repoRoot: string): Fingerprint | null {
 export interface GateOptions {
   /** Override the previous fingerprint (null = structural check disabled). Default reads git HEAD. */
   previousFingerprint?: Fingerprint | null;
-}
-
-const IGNORED_DIRS = new Set(["node_modules", "dist", ".git"]);
-
-/** Every file in the repo as repo-relative POSIX paths. */
-function listFiles(repoRoot: string): Set<string> {
-  const files = new Set<string>();
-  const walk = (dir: string): void => {
-    for (const dirent of readdirSync(dir, { withFileTypes: true })) {
-      if (dirent.isDirectory()) {
-        if (!IGNORED_DIRS.has(dirent.name)) walk(join(dir, dirent.name));
-      } else if (dirent.isFile()) {
-        const rel = join(dir, dirent.name).slice(repoRoot.length + 1).split(sep).join("/");
-        files.add(rel);
-      }
-    }
-  };
-  walk(repoRoot);
-  return files;
 }
 
 /** Compose the gate over an already-resolved change set. */
