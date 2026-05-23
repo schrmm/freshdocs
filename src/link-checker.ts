@@ -77,3 +77,18 @@ export function checkInternalLinks(docs: DocFile[], existingFiles: Set<string>):
 
   return findings;
 }
+
+/** Unique external URLs (http/https/protocol-relative) appearing in markdown link targets. */
+export function externalUrlsFrom(docs: DocFile[]): string[] {
+  const urls = new Set<string>();
+  for (const doc of docs) {
+    for (const m of doc.content.matchAll(LINK_RE)) {
+      const target = m[1]!;
+      if (!EXTERNAL.test(target)) continue;
+      if (target.startsWith("mailto:")) continue;
+      const [pathPart] = splitAnchor(target);
+      urls.add(pathPart);
+    }
+  }
+  return [...urls];
+}
