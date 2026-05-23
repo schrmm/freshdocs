@@ -5,7 +5,7 @@ export type Severity = "fail" | "warn";
 
 export interface Finding {
   doc: string;
-  kind: "drift" | "broken-link";
+  kind: "drift" | "broken-link" | "macro-stale";
   severity: Severity;
   reason: string;
 }
