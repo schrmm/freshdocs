@@ -4,6 +4,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { runGate } from "../src/cli.ts";
+import { computeFingerprint } from "../src/structural-fingerprint.ts";
 
 function fixture(files: Record<string, string>): string {
   const root = mkdtempSync(join(tmpdir(), "freshdocs-gate-"));
@@ -62,6 +63,51 @@ test("runGate passes when a changed doc's internal links resolve", () => {
   try {
     const { exitCode } = runGate(root, ["docs/a.md"]);
     assert.equal(exitCode, 0);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("runGate warns (does not block) on macro docs when repo structure changed", () => {
+  const root = fixture({
+    "README.md": "# Project",
+    "services/x.txt": "new",
+  });
+  const prev = computeFingerprint({ topLevel: [], scripts: [], bin: [] });
+  try {
+    const { exitCode, output } = runGate(root, ["services/x.txt"], { previousFingerprint: prev });
+    assert.equal(exitCode, 0); // warn-only, never blocks
+    assert.match(output, /README\.md/);
+    assert.match(output, /structure changed/i);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("runGate emits no macro finding when the structure is unchanged", () => {
+  const root = fixture({
+    "README.md": "# P",
+    "src/a.ts": "x",
+  });
+  const prev = computeFingerprint({ topLevel: ["src"], scripts: [], bin: [] });
+  try {
+    const { exitCode, output } = runGate(root, ["src/a.ts"], { previousFingerprint: prev });
+    assert.equal(exitCode, 0);
+    assert.doesNotMatch(output, /structure changed/i);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("runGate skips a macro doc updated in the same commit", () => {
+  const root = fixture({
+    "README.md": "# Project rewritten",
+    "services/x.txt": "new",
+  });
+  const prev = computeFingerprint({ topLevel: [], scripts: [], bin: [] });
+  try {
+    const { output } = runGate(root, ["services/x.txt", "README.md"], { previousFingerprint: prev });
+    assert.doesNotMatch(output, /README\.md/);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
