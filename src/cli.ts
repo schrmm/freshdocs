@@ -1,8 +1,6 @@
-#!/usr/bin/env node
 import { execFileSync } from "node:child_process";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { pathToFileURL } from "node:url";
 import { buildIndex } from "./docmeta-index.ts";
 import { detect } from "./detect-engine.ts";
 import { checkInternalLinks, type DocFile } from "./link-checker.ts";
@@ -99,7 +97,7 @@ export function runGate(repoRoot: string, changedFiles: string[], opts: GateOpti
 }
 
 /** Files staged for the current commit (added/copied/modified/renamed). */
-function gitStagedFiles(cwd: string): string[] {
+export function gitStagedFiles(cwd: string): string[] {
   const out = execFileSync(
     "git",
     ["diff", "--cached", "--name-only", "--diff-filter=ACMR"],
@@ -110,15 +108,3 @@ function gitStagedFiles(cwd: string): string[] {
     .map((line) => line.trim())
     .filter(Boolean);
 }
-
-function main(): void {
-  const cwd = process.cwd();
-  const { exitCode, output } = runGate(cwd, gitStagedFiles(cwd));
-  process.stdout.write(`${output}\n`);
-  process.exit(exitCode);
-}
-
-const invokedDirectly =
-  process.argv[1] !== undefined &&
-  import.meta.url === pathToFileURL(process.argv[1]).href;
-if (invokedDirectly) main();

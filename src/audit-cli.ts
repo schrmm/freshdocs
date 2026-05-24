@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import { pathToFileURL } from "node:url";
 import { runAudit, type AuditReport } from "./audit.ts";
 import { initDocmeta } from "./init-docmeta.ts";
 import type { Fetcher } from "./url-health.ts";
@@ -104,12 +103,7 @@ async function main(): Promise<void> {
   // Audit is read-only and advisory — never sets a nonzero exit code.
 }
 
-const invokedDirectly =
-  process.argv[1] !== undefined &&
-  import.meta.url === pathToFileURL(process.argv[1]).href;
-if (invokedDirectly) {
-  main().catch((err) => {
-    process.stderr.write(`freshdocs-audit: ${err instanceof Error ? err.message : String(err)}\n`);
-    process.exit(2);
-  });
-}
+main().catch((err) => {
+  process.stderr.write(`freshdocs-audit: ${err instanceof Error ? err.message : String(err)}\n`);
+  process.exit(2);
+});
