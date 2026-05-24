@@ -1,24 +1,46 @@
 {
   "name": "freshdocs",
   "version": "0.0.1",
-  "description": "Keep project documentation reflecting the current state of the codebase",
+  "description": "Keep project documentation reflecting the current state of the codebase. A portable doc-health Agent Skill: deterministic commit-time gate + LLM-assisted repair.",
   "type": "module",
   "bin": {
-    "doc-gate": "dist/cli.js",
-    "freshdocs-audit": "dist/audit-cli.js"
+    "doc-gate": "dist/cli-main.cjs",
+    "freshdocs-audit": "dist/audit-cli.cjs"
   },
   "files": [
-    "dist"
+    "dist",
+    "SKILL.md",
+    "commands",
+    "hooks",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/schrmm/freshdocs.git"
+  },
+  "homepage": "https://github.com/schrmm/freshdocs#readme",
+  "bugs": "https://github.com/schrmm/freshdocs/issues",
+  "keywords": [
+    "agent-skill",
+    "claude-code",
+    "documentation",
+    "doc-drift",
+    "pre-commit",
+    "git-hook",
+    "ai-agent",
+    "skills.sh"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "esbuild src/cli-main.ts src/audit-cli.ts --bundle --platform=node --format=cjs --target=node22 --outdir=dist --out-extension:.js=.cjs",
     "test": "node --import tsx --test \"test/**/*.test.ts\"",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepare": "node -e \"const fs=require('node:fs');if(fs.existsSync('src')&&!fs.existsSync('dist/cli.js')){require('node:child_process').execSync('npm run build',{stdio:'inherit'})}\""
   },
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^22.10.0",
     "@types/picomatch": "^4.0.3",
+    "esbuild": "^0.28.0",
     "tsx": "^4.19.0",
     "typescript": "^5.7.0"
   },

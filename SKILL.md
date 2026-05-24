@@ -28,7 +28,7 @@ Run the tooling first to get a precise list of work, then judge from there:
 
 For each finding, in this order:
 
-1. **Drift (`covered file changed without doc update`).** Read the diff for the covered files and the flagged doc. Reconcile: update the doc's prose to match the new behavior — be terse and exact for `docs/agents/**` and agent-context files (`CLAUDE.md`/`AGENTS.md`); narrative is acceptable for `docs/**`. After the prose is correct, call `bumpFrontmatter(content, { synced: <current HEAD SHA>, reviewed: <today YYYY-MM-DD> })` and write the file.
+1. **Drift (`covered file changed without doc update`).** Read the diff for the covered files and the flagged doc. Reconcile: update the doc's prose to match the new behavior — be terse and exact for `docs/agents/**` and agent-context files (`CLAUDE.md`/`AGENTS.md`); narrative is acceptable for `docs/**`. After the prose is correct, set the doc's frontmatter `synced:` to the current HEAD SHA and `reviewed:` to today (`YYYY-MM-DD`), then save.
 
 2. **Broken internal links.** Resolve the intended target — was the linked file renamed, moved, or deleted? Update the link if there's a clear successor. Remove the link only if the referent is truly gone and irrelevant. Do not invent targets.
 
