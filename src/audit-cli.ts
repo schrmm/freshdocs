@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { pathToFileURL } from "node:url";
 import { runAudit, type AuditReport } from "./audit.ts";
+import { initDocmeta } from "./init-docmeta.ts";
 import type { Fetcher } from "./url-health.ts";
 
 const HEAD_TIMEOUT_MS = 5_000;
@@ -76,7 +77,28 @@ function render(report: AuditReport): string {
   return lines.join("\n");
 }
 
+function runInit(apply: boolean): void {
+  const result = initDocmeta(process.cwd(), { dryRun: !apply });
+  if (result.proposals.length === 0) {
+    process.stdout.write("freshdocs --init: every markdown doc already has docmeta.\n");
+    return;
+  }
+  const verb = apply ? "wrote" : "would write";
+  process.stdout.write(`freshdocs --init: ${verb} docmeta for ${result.proposals.length} doc(s)\n`);
+  for (const p of result.proposals) {
+    process.stdout.write(`  - ${p.path} (audience: ${p.init.audience}, covers: [])\n`);
+  }
+  if (!apply) {
+    process.stdout.write("\nRun with --init --apply to write these.\n");
+  }
+}
+
 async function main(): Promise<void> {
+  const args = process.argv.slice(2);
+  if (args.includes("--init")) {
+    runInit(args.includes("--apply"));
+    return;
+  }
   const report = await runAudit(process.cwd(), { fetch: realFetcher });
   process.stdout.write(`${render(report)}\n`);
   // Audit is read-only and advisory — never sets a nonzero exit code.
