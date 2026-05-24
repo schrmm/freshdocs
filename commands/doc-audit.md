@@ -4,7 +4,11 @@ description: Run the read-only freshdocs audit and report documentation health (
 
 Run the documentation health audit for this repo.
 
-1. Invoke the `freshdocs-audit` bin (installed by the freshdocs package). It accepts no arguments and operates on the current working directory.
+1. Invoke the audit. Resolve the bin in this order:
+   - `freshdocs-audit` on PATH (global npm install), OR
+   - `node_modules/.bin/freshdocs-audit` (local npm install), OR
+   - `node .agents/skills/freshdocs/dist/audit-cli.cjs` (vendored by `npx skills add`).
+   It accepts no arguments and operates on the current working directory.
 2. Present the report grouped by section:
    - **Coverage** — `covered/total (percent%)`, plus the top undocumented files.
    - **Overdue reviews** — docs past their `review_interval`.

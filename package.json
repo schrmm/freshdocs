@@ -31,7 +31,7 @@
     "skills.sh"
   ],
   "scripts": {
-    "build": "esbuild src/cli-main.ts src/audit-cli.ts --bundle --platform=node --format=cjs --target=node22 --outdir=dist --out-extension:.js=.cjs",
+    "build": "npx -y esbuild src/cli-main.ts src/audit-cli.ts --bundle --platform=node --format=cjs --target=node22 --outdir=dist --out-extension:.js=.cjs",
     "test": "node --import tsx --test \"test/**/*.test.ts\"",
     "typecheck": "tsc --noEmit",
     "prepare": "npm run build"

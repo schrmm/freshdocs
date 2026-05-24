@@ -24,6 +24,8 @@ Run the tooling first to get a precise list of work, then judge from there:
 - **Audit context:** `freshdocs-audit` produces a snapshot report (coverage, overdue, broken internal links, external link health).
 - The `## Agent skills` block in `AGENTS.md` / `CLAUDE.md` tells you the repo's issue tracker, triage label vocabulary, and docs layout — read it before proposing consolidation.
 
+**Bin resolution.** Both bins resolve in this order: (1) on PATH (`doc-gate`, `freshdocs-audit` — installed by `npm i -g github:schrmm/freshdocs`); (2) `node_modules/.bin/`; (3) `node .agents/skills/freshdocs/dist/cli-main.cjs` / `audit-cli.cjs` when the skill was installed via `npx skills add schrmm/freshdocs`. Use the first one that works.
+
 ## The repair loop
 
 For each finding, in this order:
