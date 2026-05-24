@@ -95,7 +95,7 @@ export function runGate(repoRoot: string, changedFiles: string[], opts: GateOpti
     ...checkInternalLinks(changedDocs, existingFiles),
     ...structural,
   ];
-  return formatReport(findings);
+  return formatReport(findings, { ungatedCount: index.ungated.length });
 }
 
 /** Files staged for the current commit (added/copied/modified/renamed). */

@@ -29,3 +29,15 @@ test("output names each flagged doc and its severity", () => {
   assert.match(output, /fail/i);
   assert.match(output, /warn/i);
 });
+
+test("appends an un-gated nudge when un-gated docs exist", () => {
+  const { output, exitCode } = formatReport([], { ungatedCount: 3 });
+  assert.equal(exitCode, 0); // never blocks
+  assert.match(output, /3 un-gated/);
+  assert.match(output, /--init|doc-audit/i);
+});
+
+test("no nudge line when ungatedCount is 0 or omitted", () => {
+  assert.doesNotMatch(formatReport([], { ungatedCount: 0 }).output, /un-gated/);
+  assert.doesNotMatch(formatReport([]).output, /un-gated/);
+});
