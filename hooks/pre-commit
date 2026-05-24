@@ -1,13 +1,18 @@
 #!/bin/sh
 # freshdocs documentation gate (pre-commit).
-# Install into a consuming repo with:  freshdocs-install-hook   (or copy to .git/hooks/pre-commit)
+# Resolves doc-gate in this priority:
+#   1. doc-gate on PATH               (global npm install)
+#   2. node_modules/.bin/doc-gate     (local npm install)
+#   3. .agents/skills/freshdocs/dist/ (vendored by `npx skills add`)
 # Blocks the commit when staged code drifts from an agent-facing doc.
 
 if command -v doc-gate >/dev/null 2>&1; then
   exec doc-gate
 elif [ -x "node_modules/.bin/doc-gate" ]; then
   exec node_modules/.bin/doc-gate
+elif [ -f ".agents/skills/freshdocs/dist/cli-main.cjs" ]; then
+  exec node .agents/skills/freshdocs/dist/cli-main.cjs
 else
-  echo "freshdocs: doc-gate not found on PATH or in node_modules/.bin; skipping gate" >&2
+  echo "freshdocs: doc-gate not found (PATH, node_modules/.bin, or .agents/skills/freshdocs/dist); skipping gate" >&2
   exit 0
 fi
