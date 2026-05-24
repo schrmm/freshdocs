@@ -2,6 +2,9 @@ import { execFileSync } from "node:child_process";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { buildIndex } from "./docmeta-index.ts";
+// Note: gitStagedFiles lives in cli-main.ts (the bin entry); cli.ts is the
+// process-free composition the tests exercise.
+
 import { detect } from "./detect-engine.ts";
 import { checkInternalLinks, type DocFile } from "./link-checker.ts";
 import { formatReport, type Report } from "./reporter.ts";
@@ -32,8 +35,7 @@ function readShape(repoRoot: string): Fingerprint {
   try {
     const pkg = JSON.parse(readFileSync(join(repoRoot, "package.json"), "utf8"));
     if (pkg && typeof pkg.scripts === "object") scripts = Object.keys(pkg.scripts);
-    if (typeof pkg.bin === "string") bin = [pkg.name ?? "bin"];
-    else if (pkg && typeof pkg.bin === "object") bin = Object.keys(pkg.bin);
+    if (pkg && typeof pkg.bin === "object" && pkg.bin !== null) bin = Object.keys(pkg.bin);
   } catch {
     /* no package.json or unreadable — leave empty */
   }
@@ -54,8 +56,7 @@ function readHeadShape(repoRoot: string): Fingerprint | null {
       const pkgRaw = execFileSync("git", ["show", "HEAD:package.json"], { cwd: repoRoot, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
       const pkg = JSON.parse(pkgRaw);
       if (pkg && typeof pkg.scripts === "object") scripts = Object.keys(pkg.scripts);
-      if (typeof pkg.bin === "string") bin = [pkg.name ?? "bin"];
-      else if (pkg && typeof pkg.bin === "object") bin = Object.keys(pkg.bin);
+      if (pkg && typeof pkg.bin === "object" && pkg.bin !== null) bin = Object.keys(pkg.bin);
     } catch {
       /* no package.json at HEAD */
     }
@@ -96,15 +97,3 @@ export function runGate(repoRoot: string, changedFiles: string[], opts: GateOpti
   return formatReport(findings, { ungatedCount: index.ungated.length });
 }
 
-/** Files staged for the current commit (added/copied/modified/renamed). */
-export function gitStagedFiles(cwd: string): string[] {
-  const out = execFileSync(
-    "git",
-    ["diff", "--cached", "--name-only", "--diff-filter=ACMR"],
-    { cwd, encoding: "utf8" },
-  );
-  return out
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean);
-}
