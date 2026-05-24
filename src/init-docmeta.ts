@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { buildIndex, type Audience } from "./docmeta-index.ts";
+import { inferAudience } from "./audience.ts";
+import { buildIndex } from "./docmeta-index.ts";
 import { writeFrontmatter, type FrontmatterInit } from "./write-frontmatter.ts";
 
 export interface InitProposal {
@@ -16,14 +17,6 @@ export interface InitResult {
 export interface InitOptions {
   /** If true, return proposals without touching files. */
   dryRun?: boolean;
-}
-
-const AGENT_CONTEXT_FILES = new Set(["CLAUDE.md", "AGENTS.md", "CONTEXT.md"]);
-
-function inferAudience(relPath: string): Audience {
-  const basename = relPath.split("/").pop() ?? relPath;
-  if (AGENT_CONTEXT_FILES.has(basename)) return "agent";
-  return relPath.startsWith("docs/agents/") ? "agent" : "human";
 }
 
 /**

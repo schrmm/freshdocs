@@ -1,8 +1,9 @@
 import { parse as parseYaml } from "yaml";
 import { readdirSync, readFileSync } from "node:fs";
 import { join, relative, sep } from "node:path";
+import { inferAudience, type Audience } from "./audience.ts";
 
-export type Audience = "agent" | "human";
+export type { Audience } from "./audience.ts";
 
 export interface Docmeta {
   audience: Audience;
@@ -35,16 +36,6 @@ const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---/;
 
 function asString(value: unknown): string | undefined {
   return value == null ? undefined : String(value);
-}
-
-const AGENT_CONTEXT_FILES = new Set(["CLAUDE.md", "AGENTS.md", "CONTEXT.md"]);
-
-function inferAudience(relPath: string): Audience {
-  const normalized = relPath.replace(/\\/g, "/");
-  const basename = normalized.split("/").pop() ?? normalized;
-  if (AGENT_CONTEXT_FILES.has(basename)) return "agent";
-  if (normalized.startsWith("docs/agents/")) return "agent";
-  return "human";
 }
 
 export function parseDocmeta(content: string, relPath: string): ParseResult {
