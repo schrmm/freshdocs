@@ -1,7 +1,7 @@
 ---
 audience: human
 covers: ["src/**"]
-synced: bee7d5e46db8c5f84d074930de752dbabbe3f3c6
+synced: dc9c73b729c593e60b1924788e11cb2bd261e449
 reviewed: 2026-05-24
 review_interval: 60d
 ---
@@ -28,18 +28,22 @@ pnpm add -g github:schrmm/freshdocs
 
 Either install path is self-contained: `npx skills add` vendors a pre-built `dist/` (no `npm install` needed); `npm install -g github:` runs a `prepare` script that bundles the two bins with `npx esbuild` (works on Windows where `node_modules/.bin/` isn't on PATH during prepare).
 
-### Wire the commit gate
+### Wire it up
+
+Two install bins; run from inside the target repo:
 
 ```sh
-# In any repo where you want freshdocs to gate commits.
-# If installed via skills.sh:
-cp .agents/skills/freshdocs/hooks/pre-commit .git/hooks/pre-commit
-# If installed via npm:
-cp node_modules/freshdocs/hooks/pre-commit .git/hooks/pre-commit
-chmod +x .git/hooks/pre-commit
+# Install the pre-commit gate into this repo's .git/hooks/:
+freshdocs-install-hook
+
+# Install the /freshdocs:doc-audit and /freshdocs:update-docs
+# slash commands into ~/.claude/commands/freshdocs/ (one-time, global):
+freshdocs-install-commands
 ```
 
-The hook resolves `doc-gate` in three tiers: PATH → `node_modules/.bin/` → `.agents/skills/freshdocs/dist/cli-main.cjs` via `node`. The first one that exists wins.
+`freshdocs-install-hook` refuses to clobber a non-freshdocs `pre-commit` hook; pass `--force` to override. Both bins resolve their source files (`hooks/pre-commit`, `commands/*.md`) from wherever freshdocs is installed — works for both `npx skills add` and `npm i -g github:` layouts.
+
+The hook itself resolves `doc-gate` at runtime in three tiers: PATH → `node_modules/.bin/` → `.agents/skills/freshdocs/dist/cli-main.cjs` via `node`. The first one that exists wins.
 
 ## What it detects
 
@@ -101,7 +105,7 @@ The skill itself (`SKILL.md`) is the judgment layer. It is automatically loaded 
 1. `npx skills add schrmm/freshdocs` in each repo (or globally per host).
 2. Uninstall / archive the four replaced skills/commands.
 3. Run `freshdocs-audit --init --apply` to bootstrap `docmeta` on existing docs.
-4. Install the pre-commit hook from wherever freshdocs landed (`cp .agents/skills/freshdocs/hooks/pre-commit .git/hooks/` for skills.sh, `cp node_modules/freshdocs/hooks/pre-commit .git/hooks/` for npm).
+4. Run `freshdocs-install-hook` (per repo) and `freshdocs-install-commands` (once per host).
 5. Commit. The next failed gate is your migration-complete signal.
 
 ## Architecture
