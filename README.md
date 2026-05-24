@@ -1,3 +1,11 @@
+---
+audience: human
+covers: ["src/**"]
+synced: bee7d5e46db8c5f84d074930de752dbabbe3f3c6
+reviewed: 2026-05-24
+review_interval: 60d
+---
+
 # freshdocs
 
 Keep project documentation reflecting the current state of the codebase.
