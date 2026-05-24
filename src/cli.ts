@@ -48,7 +48,11 @@ function readHeadShape(repoRoot: string): Fingerprint | null {
     const topLevel: string[] = [];
     for (const line of tree.split(/\r?\n/)) {
       const match = line.match(/^\d+\s+(\w+)\s+\S+\s+(.+)$/);
-      if (match && match[1] === "tree") topLevel.push(match[2]!);
+      if (match && match[1] === "tree") {
+        const name = match[2]!;
+        // Apply the same filter as readShape so HEAD and working-tree fingerprints stay symmetric.
+        if (!IGNORED_DIRS.has(name) && !name.startsWith(".")) topLevel.push(name);
+      }
     }
     let scripts: string[] = [];
     let bin: string[] = [];

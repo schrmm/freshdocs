@@ -74,7 +74,7 @@ export function parseDocmeta(content: string, relPath: string): ParseResult {
   };
 }
 
-const IGNORED_DIRS = new Set(["node_modules", "dist", ".git"]);
+const IGNORED_DIRS = new Set(["node_modules", "dist", ".git", ".agents"]);
 
 function* walkMarkdown(root: string, dir: string): Generator<string> {
   for (const dirent of readdirSync(dir, { withFileTypes: true })) {

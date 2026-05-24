@@ -9164,7 +9164,7 @@ function parseDocmeta(content, relPath) {
     }
   };
 }
-var IGNORED_DIRS = /* @__PURE__ */ new Set(["node_modules", "dist", ".git"]);
+var IGNORED_DIRS = /* @__PURE__ */ new Set(["node_modules", "dist", ".git", ".agents"]);
 function* walkMarkdown(root, dir) {
   for (const dirent of (0, import_node_fs.readdirSync)(dir, { withFileTypes: true })) {
     if (dirent.isDirectory()) {
@@ -9291,7 +9291,7 @@ ${nudgeLine}` : headline
 // src/repo-files.ts
 var import_node_fs2 = require("node:fs");
 var import_node_path3 = require("node:path");
-var IGNORED_DIRS2 = /* @__PURE__ */ new Set(["node_modules", "dist", ".git"]);
+var IGNORED_DIRS2 = /* @__PURE__ */ new Set(["node_modules", "dist", ".git", ".agents"]);
 function listFiles(repoRoot) {
   const files = /* @__PURE__ */ new Set();
   const walk = (dir) => {
@@ -9372,7 +9372,10 @@ function readHeadShape(repoRoot) {
     const topLevel = [];
     for (const line of tree.split(/\r?\n/)) {
       const match = line.match(/^\d+\s+(\w+)\s+\S+\s+(.+)$/);
-      if (match && match[1] === "tree") topLevel.push(match[2]);
+      if (match && match[1] === "tree") {
+        const name = match[2];
+        if (!IGNORED_DIRS2.has(name) && !name.startsWith(".")) topLevel.push(name);
+      }
     }
     let scripts = [];
     let bin = [];

@@ -9160,7 +9160,7 @@ function parseDocmeta(content, relPath) {
     }
   };
 }
-var IGNORED_DIRS = /* @__PURE__ */ new Set(["node_modules", "dist", ".git"]);
+var IGNORED_DIRS = /* @__PURE__ */ new Set(["node_modules", "dist", ".git", ".agents"]);
 function* walkMarkdown(root, dir) {
   for (const dirent of (0, import_node_fs.readdirSync)(dir, { withFileTypes: true })) {
     if (dirent.isDirectory()) {
@@ -9268,7 +9268,7 @@ function externalUrlsFrom(docs) {
 // src/repo-files.ts
 var import_node_fs2 = require("node:fs");
 var import_node_path3 = require("node:path");
-var IGNORED_DIRS2 = /* @__PURE__ */ new Set(["node_modules", "dist", ".git"]);
+var IGNORED_DIRS2 = /* @__PURE__ */ new Set(["node_modules", "dist", ".git", ".agents"]);
 function listFiles(repoRoot) {
   const files = /* @__PURE__ */ new Set();
   const walk = (dir) => {
