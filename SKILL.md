@@ -3,7 +3,7 @@ name: freshdocs
 description: Reconcile documentation discrepancies surfaced by the freshdocs gate or audit — drift, broken links, consolidation needs, overdue reviews. Use when /update-docs is invoked, when the doc-gate has failed a commit, or when /doc-audit reports findings. Cooperates with grill-with-docs (CONTEXT.md / ADRs are out of scope).
 audience: agent
 covers: ["src/cli.ts", "src/cli-main.ts", "src/detect-engine.ts", "src/structural-fingerprint.ts", "src/link-checker.ts", "src/url-health.ts"]
-synced: 8b4cd2cebc79f3f5a163c4cdcef300436516d5ae
+synced: 33179f9532f5be57d07a09cb8d68787c76028db4
 reviewed: 2026-05-24
 review_interval: 30d
 ---

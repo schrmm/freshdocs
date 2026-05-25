@@ -5,7 +5,7 @@ import { buildIndex } from "./docmeta-index.ts";
 // Note: gitStagedFiles lives in cli-main.ts (the bin entry); cli.ts is the
 // process-free composition the tests exercise.
 
-import { detect } from "./detect-engine.ts";
+import { detect, detectUncovered } from "./detect-engine.ts";
 import { checkInternalLinks, type DocFile } from "./link-checker.ts";
 import { formatReport, type Report } from "./reporter.ts";
 import { IGNORED_DIRS, listFiles } from "./repo-files.ts";
@@ -73,6 +73,8 @@ function readHeadShape(repoRoot: string): Fingerprint | null {
 export interface GateOptions {
   /** Override the previous fingerprint (null = structural check disabled). Default reads git HEAD. */
   previousFingerprint?: Fingerprint | null;
+  /** Files newly created (git status A) in this change set. Default: empty (no uncovered check). */
+  newlyAddedFiles?: string[];
 }
 
 /** Compose the gate over an already-resolved change set. */
@@ -93,10 +95,15 @@ export function runGate(repoRoot: string, changedFiles: string[], opts: GateOpti
       )
     : [];
 
+  const uncovered = (opts.newlyAddedFiles && opts.newlyAddedFiles.length > 0)
+    ? detectUncovered({ newlyAddedFiles: opts.newlyAddedFiles, index })
+    : [];
+
   const findings = [
     ...detect({ changedFiles, index }),
     ...checkInternalLinks(changedDocs, existingFiles),
     ...structural,
+    ...uncovered,
   ];
   return formatReport(findings, { ungatedCount: index.ungated.length });
 }

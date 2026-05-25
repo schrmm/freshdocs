@@ -9381,7 +9381,7 @@ async function runAudit(repoRoot, opts = {}) {
   const brokenLinks = checkInternalLinks(allDocs, existing);
   const externalLinks = await urlHealth(externalUrlsFrom(allDocs), { fetch: fetch2 });
   const coverage = coverageOf(codeFiles, index);
-  return { coverage, overdue, brokenLinks, externalLinks };
+  return { coverage, overdue, brokenLinks, externalLinks, uncovered: coverage.uncoveredFiles };
 }
 
 // src/init-docmeta.ts
