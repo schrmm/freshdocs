@@ -2,7 +2,7 @@
 description: Reconcile documentation flagged by the freshdocs gate or audit. Updates prose, fixes links, bumps frontmatter, routes deep CONTEXT.md / ADR work to grill-with-docs.
 audience: agent
 covers: ["src/cli.ts", "src/cli-main.ts", "src/bump-frontmatter.ts"]
-synced: bee7d5e46db8c5f84d074930de752dbabbe3f3c6
+synced: 33179f9532f5be57d07a09cb8d68787c76028db4
 reviewed: 2026-05-24
 review_interval: 30d
 ---

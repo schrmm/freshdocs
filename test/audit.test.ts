@@ -24,9 +24,11 @@ test("runAudit reports coverage stats over the supplied code files", async () =>
       codeFiles: ["src/a.ts", "src/b.ts"],
       fetch: async () => ({ status: 200 }),
     });
-    assert.equal(report.coverage.covered, 1);
+    assert.equal(report.coverage.explicit, 1);
+    assert.equal(report.coverage.wildcardOnly, 0);
+    assert.equal(report.coverage.uncovered, 1);
     assert.equal(report.coverage.total, 2);
-    assert.deepEqual(report.coverage.undocumented, ["src/b.ts"]);
+    assert.deepEqual(report.coverage.uncoveredFiles, ["src/b.ts"]);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
@@ -82,6 +84,21 @@ test("runAudit classifies external URLs via the injected fetcher (no real networ
     const down = report.externalLinks.find((l) => l.url === "https://down.example")!;
     assert.equal(up.ok, true);
     assert.equal(down.ok, false);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("runAudit: uncovered field mirrors coverage.uncoveredFiles", async () => {
+  const root = fixture({
+    "docs/agents/api.md": '---\ncovers: ["src/a.ts"]\n---\nguide',
+  });
+  try {
+    const report = await runAudit(root, {
+      codeFiles: ["src/a.ts", "src/b.ts"],
+      fetch: async () => null,
+    });
+    assert.deepEqual(report.uncovered, report.coverage.uncoveredFiles);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

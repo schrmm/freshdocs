@@ -3,8 +3,8 @@ name: freshdocs
 description: Reconcile documentation discrepancies surfaced by the freshdocs gate or audit — drift, broken links, consolidation needs, overdue reviews. Use when /update-docs is invoked, when the doc-gate has failed a commit, or when /doc-audit reports findings. Cooperates with grill-with-docs (CONTEXT.md / ADRs are out of scope).
 audience: agent
 covers: ["src/cli.ts", "src/cli-main.ts", "src/detect-engine.ts", "src/structural-fingerprint.ts", "src/link-checker.ts", "src/url-health.ts"]
-synced: bee7d5e46db8c5f84d074930de752dbabbe3f3c6
-reviewed: 2026-05-24
+synced: 93d6a5f9b2bf7457a389f9079523c7c3621c8145
+reviewed: 2026-05-25
 review_interval: 30d
 ---
 
@@ -45,6 +45,28 @@ For each finding, in this order:
 
 5. **External link health** (from audit). Replace with the new URL if findable; otherwise remove the dead link or note the source's deprecation.
 
+## The creation loop
+
+When `/freshdocs:create-docs` is invoked (sweep or targeted), follow this loop:
+
+1. **Audit first.** Run `freshdocs-audit` to get the `uncovered` and `wildcardOnly` lists. Sweep mode operates on these; targeted mode operates on the user-supplied path.
+
+2. **Sweep mode: cluster semantically.** Read the source of each uncovered/wildcard-only file. Group files that belong to one cohesive subject into a single proposed doc (`docs/agents/<name>.md`). Do NOT propose one doc per file — the result must be navigable.
+
+3. **Present the cluster proposal to the user.** Show the grouping and let them edit it before any prose is drafted.
+
+4. **Draft per group, code-first.** For each approved group:
+   - Read every source file in the group.
+   - Draft a concise reference doc: purpose, public API, how it's invoked, gotchas. Lean toward terse over verbose — agent docs are reference material.
+   - Mark anything you can't confidently infer from code as `[CLARIFY: ...]` inline. Never invent prose.
+   - Write the file to `docs/agents/<name>.md` with full docmeta (audience: agent, covers: <literal paths>, synced: <HEAD SHA>, reviewed: <today YYYY-MM-DD>, review_interval: 30d).
+
+5. **Review per file.** Surface the draft to the user; accept their edits before the next group.
+
+6. **Hand off to grill-with-docs when you'd otherwise invent domain language.** If drafting requires more than ~2 unknown business / workflow / terminology terms, STOP and surface: "This doc needs domain language before I can draft confidently. Invoke `grill-with-docs` first?" Never invent terminology.
+
+7. **Workflow / orientation docs are targeted-mode only in v1.** If sweep mode encounters a workflow doc candidate, note it but do not draft. The user invokes `/freshdocs:create-docs docs/workflows/<name>.md` explicitly.
+
 ## DRY and consolidation methodology
 
 When reading docs to reconcile, also notice:
@@ -80,3 +102,15 @@ Run `doc-gate` (and/or `freshdocs-audit`) again to confirm the previously-flagge
 - Author PRDs — that's `to-prd`.
 - Run the detection itself — that's `doc-gate` and `freshdocs-audit`. Always use them to get the list of work; never guess.
 - Touch documentation outside the flagged set unless you are doing a sanctioned consolidation pass.
+
+## When to use which command
+
+| Situation | First command |
+|---|---|
+| Fresh repo / starting adoption | `/freshdocs:doc-audit` → `/freshdocs:create-docs` (sweep) |
+| Commit blocked by gate | `/freshdocs:update-docs` |
+| Commit warned: new uncovered file | `/freshdocs:create-docs <path>` |
+| Want to document a specific module now | `/freshdocs:create-docs <path>` |
+| Quarterly review / pre-release | `/freshdocs:doc-audit` → dispatch |
+| Doc contradicts accepted ADR | hand off to `grill-with-docs` (superseding ADR) |
+| New CONTEXT.md / domain language needed | hand off to `grill-with-docs` |

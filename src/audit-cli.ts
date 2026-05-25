@@ -34,13 +34,26 @@ const realFetcher: Fetcher = async (url) => {
 function render(report: AuditReport): string {
   const lines: string[] = ["freshdocs audit"];
 
+  const c = report.coverage;
   lines.push("");
-  lines.push(`Coverage: ${report.coverage.covered}/${report.coverage.total} (${report.coverage.percent}%)`);
-  if (report.coverage.undocumented.length > 0) {
-    lines.push(`  undocumented (${report.coverage.undocumented.length}):`);
-    for (const p of report.coverage.undocumented.slice(0, 20)) lines.push(`    - ${p}`);
-    if (report.coverage.undocumented.length > 20) {
-      lines.push(`    ... and ${report.coverage.undocumented.length - 20} more`);
+  lines.push(`Coverage:`);
+  lines.push(`  Explicitly documented: ${c.explicit}/${c.total} (${c.percent}%)`);
+  lines.push(`  Wildcard-only:         ${c.wildcardOnly}/${c.total}`);
+  lines.push(`  Uncovered:             ${c.uncovered}/${c.total}`);
+  if (c.wildcardOnlyFiles.length > 0) {
+    lines.push("");
+    lines.push(`  wildcard-only (${c.wildcardOnlyFiles.length}):`);
+    for (const p of c.wildcardOnlyFiles.slice(0, 20)) lines.push(`    - ${p}`);
+    if (c.wildcardOnlyFiles.length > 20) {
+      lines.push(`    ... and ${c.wildcardOnlyFiles.length - 20} more`);
+    }
+  }
+  if (c.uncoveredFiles.length > 0) {
+    lines.push("");
+    lines.push(`  uncovered (${c.uncoveredFiles.length}):`);
+    for (const p of c.uncoveredFiles.slice(0, 20)) lines.push(`    - ${p}`);
+    if (c.uncoveredFiles.length > 20) {
+      lines.push(`    ... and ${c.uncoveredFiles.length - 20} more`);
     }
   }
 

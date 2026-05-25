@@ -126,3 +126,20 @@ test("runGate only link-checks changed docs, not untouched ones", () => {
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test("runGate: uncovered WARN for newly-added src file with no explicit cover", () => {
+  const root = fixture({
+    "docs/overview.md": "---\ncovers: [\"src/**\"]\nsynced: abc\n---\noverview",
+  });
+  try {
+    const report = runGate(root, [], {
+      previousFingerprint: null,
+      newlyAddedFiles: ["src/foo.ts"],
+    });
+    assert.match(report.output, /WARN\s+src\/foo\.ts/);
+    assert.match(report.output, /new source file with no explicit doc coverage/);
+    assert.equal(report.exitCode, 0);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});

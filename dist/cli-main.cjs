@@ -9189,6 +9189,13 @@ function buildIndex(repoRoot) {
 
 // src/detect-engine.ts
 var import_picomatch = __toESM(require_picomatch2(), 1);
+
+// src/coverage.ts
+function isExplicitCover(cover) {
+  return !cover.includes("*");
+}
+
+// src/detect-engine.ts
 function detect({ changedFiles, index }) {
   const changed = new Set(changedFiles);
   const findings = [];
@@ -9203,6 +9210,32 @@ function detect({ changedFiles, index }) {
       kind: "drift",
       severity: entry.meta.audience === "agent" ? "fail" : "warn",
       reason: `covered file changed without doc update: ${hit}`
+    });
+  }
+  return findings;
+}
+var DEFAULT_CODE_PREFIXES = ["src/", "lib/", "app/", "packages/"];
+function detectUncovered({
+  newlyAddedFiles,
+  index,
+  codePrefixes = DEFAULT_CODE_PREFIXES
+}) {
+  const explicitSet = /* @__PURE__ */ new Set();
+  for (const entry of index.entries) {
+    for (const cover of entry.meta.covers) {
+      if (isExplicitCover(cover)) explicitSet.add(cover);
+    }
+  }
+  const findings = [];
+  for (const file of newlyAddedFiles) {
+    if (file.endsWith(".md")) continue;
+    if (!codePrefixes.some((p) => file.startsWith(p))) continue;
+    if (explicitSet.has(file)) continue;
+    findings.push({
+      doc: file,
+      kind: "uncovered",
+      severity: "warn",
+      reason: "new source file with no explicit doc coverage"
     });
   }
   return findings;
@@ -9401,10 +9434,12 @@ function runGate(repoRoot, changedFiles, opts = {}) {
     [...existingFiles].filter(isMacroDoc),
     changedFiles
   ) : [];
+  const uncovered = opts.newlyAddedFiles && opts.newlyAddedFiles.length > 0 ? detectUncovered({ newlyAddedFiles: opts.newlyAddedFiles, index }) : [];
   const findings = [
     ...detect({ changedFiles, index }),
     ...checkInternalLinks(changedDocs, existingFiles),
-    ...structural
+    ...structural,
+    ...uncovered
   ];
   return formatReport(findings, { ungatedCount: index.ungated.length });
 }
@@ -9418,8 +9453,18 @@ function gitStagedFiles(cwd2) {
   );
   return out.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
 }
+function gitNewlyAddedFiles(cwd2) {
+  const out = (0, import_node_child_process2.execFileSync)(
+    "git",
+    ["diff", "--cached", "--name-only", "--diff-filter=A"],
+    { cwd: cwd2, encoding: "utf8" }
+  );
+  return out.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+}
 var cwd = process.cwd();
-var { exitCode, output } = runGate(cwd, gitStagedFiles(cwd));
+var { exitCode, output } = runGate(cwd, gitStagedFiles(cwd), {
+  newlyAddedFiles: gitNewlyAddedFiles(cwd)
+});
 process.stdout.write(`${output}
 `);
 process.exit(exitCode);

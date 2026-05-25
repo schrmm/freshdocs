@@ -1,8 +1,8 @@
 ---
 audience: human
 covers: ["src/**"]
-synced: dc9c73b729c593e60b1924788e11cb2bd261e449
-reviewed: 2026-05-24
+synced: 4c032af559103ae3f661b068529e3a9f2ecb79ac
+reviewed: 2026-05-25
 review_interval: 60d
 ---
 
@@ -52,11 +52,62 @@ The hook itself resolves `doc-gate` at runtime in three tiers: PATH → `node_mo
 | Docs-vs-code drift | A `covers` glob matched a changed file and the doc wasn't updated | Gate (commit/PR) |
 | Broken internal links | Relative paths or heading anchors that don't resolve | Gate (changed docs) + Audit (all docs) |
 | Macro staleness | Repo shape changed (top-level dirs / package.json scripts or bin) | Gate |
-| Coverage gaps | Code files not covered by any doc's `covers` | Audit |
+| Coverage gaps | Code files reached only by wildcard `covers:` or not at all (explicit literal paths satisfy the existence axis) | Audit |
+| Uncovered (new) | A newly-added source file has no doc listing it explicitly | Gate (per-commit, WARN) + Audit (state) |
 | Overdue reviews | `reviewed + review_interval < today` | Audit |
 | External link health | HTTP HEAD → GET fallback to avoid false-broken on sites that block HEAD | Audit |
 
 Agent-facing docs (`docs/agents/**`, `CLAUDE.md`, `AGENTS.md`, `CONTEXT.md`) **fail** the gate. Human docs (`docs/**`) **warn**. Macro stale, contradiction, and external-link findings are advisory.
+
+## Workflow recipes
+
+### A. Onboarding sweep (primary entry, fresh repo)
+
+```
+1. npx skills add schrmm/freshdocs       # vendors skill + bins
+2. freshdocs-install-commands             # one-time, global slash commands
+3. freshdocs-install-hook                 # per-repo, wire pre-commit
+4. freshdocs-audit --init --apply         # bootstrap empty docmeta blocks
+5. /freshdocs:doc-audit                   # see the honest gap
+6. /freshdocs:create-docs                 # sweep: cluster → approve → draft → review
+7. /freshdocs:update-docs                 # repair any pre-existing drift
+8. git add . && git commit                # gate should pass
+```
+
+### B. Steady-state commit loop (the heartbeat)
+
+```
+1. Edit code → git add → git commit
+2. Pre-commit hook runs doc-gate:
+   ├─ Clean                   → commit lands
+   ├─ Drift / broken-link     → BLOCKS  → /freshdocs:update-docs → re-commit
+   ├─ Uncovered (new file)    → WARN    → commit lands; /freshdocs:create-docs <path> when ready
+   └─ Macro-stale             → WARN    → commit lands; review when convenient
+```
+
+### C. Periodic health-check (safety net)
+
+```
+1. /freshdocs:doc-audit
+2. Read sections:
+   - Explicit coverage % — gap visible
+   - Overdue reviews     → /freshdocs:update-docs
+   - Uncovered (state)   → /freshdocs:create-docs
+   - Broken external     → /freshdocs:update-docs
+   - Macro-stale         → /freshdocs:update-docs
+```
+
+### Decision table — "when to use which"
+
+| Situation | First command |
+|---|---|
+| Fresh repo / starting adoption | `/freshdocs:doc-audit` → `/freshdocs:create-docs` (sweep) |
+| Commit blocked by gate | `/freshdocs:update-docs` |
+| Commit warned: new uncovered file | `/freshdocs:create-docs <path>` |
+| Want to document a specific module now | `/freshdocs:create-docs <path>` |
+| Quarterly review / pre-release | `/freshdocs:doc-audit` → dispatch |
+| Doc contradicts accepted ADR | hand off to `grill-with-docs` (superseding ADR) |
+| New CONTEXT.md / domain language needed | hand off to `grill-with-docs` |
 
 ## The `docmeta` convention
 

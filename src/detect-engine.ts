@@ -1,11 +1,13 @@
 import picomatch from "picomatch";
 import type { DocIndex } from "./docmeta-index.ts";
+import { isExplicitCover } from "./coverage.ts";
 
 export type Severity = "fail" | "warn";
 
 export interface Finding {
+  /** For drift/broken-link/macro-stale this is a doc path. For uncovered it is the file lacking docs. */
   doc: string;
-  kind: "drift" | "broken-link" | "macro-stale";
+  kind: "drift" | "broken-link" | "macro-stale" | "uncovered";
   severity: Severity;
   reason: string;
 }
@@ -41,5 +43,47 @@ export function detect({ changedFiles, index }: DetectInput): Finding[] {
     });
   }
 
+  return findings;
+}
+
+export const DEFAULT_CODE_PREFIXES = ["src/", "lib/", "app/", "packages/"] as const;
+
+export interface UncoveredInput {
+  /** Files newly created (git status A) in this commit / staged set. */
+  newlyAddedFiles: string[];
+  index: DocIndex;
+  /** Override the default code-surface prefixes. */
+  codePrefixes?: readonly string[];
+}
+
+/**
+ * Per-commit existence detector. Fires WARN for every newly-added source file
+ * that no doc lists explicitly. Wildcards do not satisfy this check —
+ * `src/**` keeps drift wired, but doesn't pre-satisfy existence for new files.
+ */
+export function detectUncovered({
+  newlyAddedFiles,
+  index,
+  codePrefixes = DEFAULT_CODE_PREFIXES,
+}: UncoveredInput): Finding[] {
+  const explicitSet = new Set<string>();
+  for (const entry of index.entries) {
+    for (const cover of entry.meta.covers) {
+      if (isExplicitCover(cover)) explicitSet.add(cover);
+    }
+  }
+
+  const findings: Finding[] = [];
+  for (const file of newlyAddedFiles) {
+    if (file.endsWith(".md")) continue;
+    if (!codePrefixes.some((p) => file.startsWith(p))) continue;
+    if (explicitSet.has(file)) continue;
+    findings.push({
+      doc: file,
+      kind: "uncovered",
+      severity: "warn",
+      reason: "new source file with no explicit doc coverage",
+    });
+  }
   return findings;
 }

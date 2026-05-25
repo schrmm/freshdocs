@@ -9185,19 +9185,50 @@ function buildIndex(repoRoot) {
 
 // src/coverage.ts
 var import_picomatch = __toESM(require_picomatch2(), 1);
+function isExplicitCover(cover) {
+  return !cover.includes("*");
+}
 function coverageOf(codeFiles, index) {
   if (codeFiles.length === 0) {
-    return { covered: 0, total: 0, percent: 100, undocumented: [] };
+    return {
+      total: 0,
+      explicit: 0,
+      wildcardOnly: 0,
+      uncovered: 0,
+      percent: 100,
+      explicitFiles: [],
+      wildcardOnlyFiles: [],
+      uncoveredFiles: []
+    };
   }
-  const matchers = index.entries.filter((e) => e.meta.covers.length > 0).map((e) => (0, import_picomatch.default)(e.meta.covers));
-  const undocumented = [];
-  let covered = 0;
+  const explicitSet = /* @__PURE__ */ new Set();
+  const wildcardGlobs = [];
+  for (const entry of index.entries) {
+    for (const cover of entry.meta.covers) {
+      if (isExplicitCover(cover)) explicitSet.add(cover);
+      else wildcardGlobs.push(cover);
+    }
+  }
+  const wildcardMatch = wildcardGlobs.length > 0 ? (0, import_picomatch.default)(wildcardGlobs) : () => false;
+  const explicitFiles = [];
+  const wildcardOnlyFiles = [];
+  const uncoveredFiles = [];
   for (const file of codeFiles) {
-    if (matchers.some((m) => m(file))) covered += 1;
-    else undocumented.push(file);
+    if (explicitSet.has(file)) explicitFiles.push(file);
+    else if (wildcardMatch(file)) wildcardOnlyFiles.push(file);
+    else uncoveredFiles.push(file);
   }
-  const percent = Math.round(covered / codeFiles.length * 1e3) / 10;
-  return { covered, total: codeFiles.length, percent, undocumented };
+  const percent = Math.round(explicitFiles.length / codeFiles.length * 1e3) / 10;
+  return {
+    total: codeFiles.length,
+    explicit: explicitFiles.length,
+    wildcardOnly: wildcardOnlyFiles.length,
+    uncovered: uncoveredFiles.length,
+    percent,
+    explicitFiles,
+    wildcardOnlyFiles,
+    uncoveredFiles
+  };
 }
 
 // src/link-checker.ts
@@ -9350,7 +9381,7 @@ async function runAudit(repoRoot, opts = {}) {
   const brokenLinks = checkInternalLinks(allDocs, existing);
   const externalLinks = await urlHealth(externalUrlsFrom(allDocs), { fetch: fetch2 });
   const coverage = coverageOf(codeFiles, index);
-  return { coverage, overdue, brokenLinks, externalLinks };
+  return { coverage, overdue, brokenLinks, externalLinks, uncovered: coverage.uncoveredFiles };
 }
 
 // src/init-docmeta.ts
@@ -9421,13 +9452,26 @@ var realFetcher = async (url) => {
 };
 function render(report) {
   const lines = ["freshdocs audit"];
+  const c = report.coverage;
   lines.push("");
-  lines.push(`Coverage: ${report.coverage.covered}/${report.coverage.total} (${report.coverage.percent}%)`);
-  if (report.coverage.undocumented.length > 0) {
-    lines.push(`  undocumented (${report.coverage.undocumented.length}):`);
-    for (const p of report.coverage.undocumented.slice(0, 20)) lines.push(`    - ${p}`);
-    if (report.coverage.undocumented.length > 20) {
-      lines.push(`    ... and ${report.coverage.undocumented.length - 20} more`);
+  lines.push(`Coverage:`);
+  lines.push(`  Explicitly documented: ${c.explicit}/${c.total} (${c.percent}%)`);
+  lines.push(`  Wildcard-only:         ${c.wildcardOnly}/${c.total}`);
+  lines.push(`  Uncovered:             ${c.uncovered}/${c.total}`);
+  if (c.wildcardOnlyFiles.length > 0) {
+    lines.push("");
+    lines.push(`  wildcard-only (${c.wildcardOnlyFiles.length}):`);
+    for (const p of c.wildcardOnlyFiles.slice(0, 20)) lines.push(`    - ${p}`);
+    if (c.wildcardOnlyFiles.length > 20) {
+      lines.push(`    ... and ${c.wildcardOnlyFiles.length - 20} more`);
+    }
+  }
+  if (c.uncoveredFiles.length > 0) {
+    lines.push("");
+    lines.push(`  uncovered (${c.uncoveredFiles.length}):`);
+    for (const p of c.uncoveredFiles.slice(0, 20)) lines.push(`    - ${p}`);
+    if (c.uncoveredFiles.length > 20) {
+      lines.push(`    ... and ${c.uncoveredFiles.length - 20} more`);
     }
   }
   lines.push("");
