@@ -8,6 +8,11 @@ export interface CoverageReport {
   undocumented: string[];
 }
 
+/** A `covers:` entry satisfies the existence axis only when it has no wildcards. */
+export function isExplicitCover(cover: string): boolean {
+  return !cover.includes("*");
+}
+
 /** Fraction of code files matched by at least one doc's `covers` glob. */
 export function coverageOf(codeFiles: string[], index: DocIndex): CoverageReport {
   if (codeFiles.length === 0) {

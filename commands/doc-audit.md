@@ -2,7 +2,7 @@
 description: Run the read-only freshdocs audit and report documentation health (coverage, overdue reviews, broken internal links, external link health). Makes no changes.
 audience: agent
 covers: ["src/audit-cli.ts", "src/audit.ts", "src/coverage.ts"]
-synced: bee7d5e46db8c5f84d074930de752dbabbe3f3c6
+synced: 2026-05-25
 reviewed: 2026-05-24
 review_interval: 30d
 ---

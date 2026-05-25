@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { coverageOf } from "../src/coverage.ts";
+import { coverageOf, isExplicitCover } from "../src/coverage.ts";
 import type { DocIndex } from "../src/docmeta-index.ts";
 
 function index(...covers: string[][]): DocIndex {
@@ -41,4 +41,18 @@ test("empty file list returns 0/0 and 100% (no undocumented surface)", () => {
   assert.equal(report.covered, 0);
   assert.equal(report.percent, 100);
   assert.deepEqual(report.undocumented, []);
+});
+
+test("isExplicitCover: literal path is explicit", () => {
+  assert.equal(isExplicitCover("src/audience.ts"), true);
+});
+
+test("isExplicitCover: brace expansion with no wildcard is explicit", () => {
+  assert.equal(isExplicitCover("src/{audit-cli,audit}.ts"), true);
+});
+
+test("isExplicitCover: anything containing * is not explicit", () => {
+  assert.equal(isExplicitCover("src/**"), false);
+  assert.equal(isExplicitCover("src/*.ts"), false);
+  assert.equal(isExplicitCover("src/internals/*.ts"), false);
 });
