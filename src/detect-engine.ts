@@ -4,8 +4,9 @@ import type { DocIndex } from "./docmeta-index.ts";
 export type Severity = "fail" | "warn";
 
 export interface Finding {
+  /** For drift/broken-link/macro-stale this is a doc path. For uncovered it is the file lacking docs. */
   doc: string;
-  kind: "drift" | "broken-link" | "macro-stale";
+  kind: "drift" | "broken-link" | "macro-stale" | "uncovered";
   severity: Severity;
   reason: string;
 }
