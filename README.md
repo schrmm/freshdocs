@@ -1,7 +1,7 @@
 ---
 audience: human
 covers: ["src/**"]
-synced: 30349b96270d29e9154cc5e36bcf4d2d29aa9a17
+synced: 69373afbae77d4df504631ae1c32a70c792244c1
 reviewed: 2026-05-24
 review_interval: 60d
 ---

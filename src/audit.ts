@@ -23,6 +23,8 @@ export interface AuditReport {
   overdue: OverdueDoc[];
   brokenLinks: Finding[];
   externalLinks: LinkStatus[];
+  /** Files in the code surface that no doc lists explicitly. Mirrors coverage.uncoveredFiles. */
+  uncovered: string[];
 }
 
 export interface AuditOptions {
@@ -103,5 +105,5 @@ export async function runAudit(repoRoot: string, opts: AuditOptions = {}): Promi
   const externalLinks = await urlHealth(externalUrlsFrom(allDocs), { fetch });
   const coverage = coverageOf(codeFiles, index);
 
-  return { coverage, overdue, brokenLinks, externalLinks };
+  return { coverage, overdue, brokenLinks, externalLinks, uncovered: coverage.uncoveredFiles };
 }

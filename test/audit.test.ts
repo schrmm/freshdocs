@@ -88,3 +88,18 @@ test("runAudit classifies external URLs via the injected fetcher (no real networ
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test("runAudit: uncovered field mirrors coverage.uncoveredFiles", async () => {
+  const root = fixture({
+    "docs/agents/api.md": '---\ncovers: ["src/a.ts"]\n---\nguide',
+  });
+  try {
+    const report = await runAudit(root, {
+      codeFiles: ["src/a.ts", "src/b.ts"],
+      fetch: async () => null,
+    });
+    assert.deepEqual(report.uncovered, report.coverage.uncoveredFiles);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
