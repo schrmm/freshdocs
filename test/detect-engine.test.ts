@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { detect } from "../src/detect-engine.ts";
+import { detect, detectUncovered } from "../src/detect-engine.ts";
 import type { DocIndex } from "../src/docmeta-index.ts";
 
 function index(...entries: Array<{ path: string; audience: "agent" | "human"; covers: string[] }>): DocIndex {
@@ -60,4 +60,48 @@ test("a doc with no covers (macro) is never drift-flagged", () => {
     index: index({ path: "docs/overview.md", audience: "human", covers: [] }),
   });
   assert.deepEqual(findings, []);
+});
+
+test("detectUncovered: flags a newly-added src file with no explicit cover", () => {
+  const findings = detectUncovered({
+    newlyAddedFiles: ["src/api/widget.ts"],
+    index: index({ path: "docs/agents/api.md", audience: "agent", covers: ["src/**"] }),
+  });
+  assert.equal(findings.length, 1);
+  assert.equal(findings[0]!.kind, "uncovered");
+  assert.equal(findings[0]!.doc, "src/api/widget.ts");
+  assert.equal(findings[0]!.severity, "warn");
+});
+
+test("detectUncovered: does NOT flag when an explicit cover lists the file", () => {
+  const findings = detectUncovered({
+    newlyAddedFiles: ["src/api/widget.ts"],
+    index: index({ path: "docs/agents/api.md", audience: "agent", covers: ["src/api/widget.ts"] }),
+  });
+  assert.deepEqual(findings, []);
+});
+
+test("detectUncovered: ignores files outside code prefixes", () => {
+  const findings = detectUncovered({
+    newlyAddedFiles: ["scripts/release.sh", "config/foo.yml"],
+    index: index({ path: "docs/agents/api.md", audience: "agent", covers: [] }),
+  });
+  assert.deepEqual(findings, []);
+});
+
+test("detectUncovered: ignores markdown files (docs themselves)", () => {
+  const findings = detectUncovered({
+    newlyAddedFiles: ["src/notes.md"],
+    index: index({ path: "docs/agents/api.md", audience: "agent", covers: [] }),
+  });
+  assert.deepEqual(findings, []);
+});
+
+test("detectUncovered: honors a custom codePrefixes override", () => {
+  const findings = detectUncovered({
+    newlyAddedFiles: ["custom/foo.ts"],
+    index: index({ path: "docs/agents/x.md", audience: "agent", covers: [] }),
+    codePrefixes: ["custom/"],
+  });
+  assert.equal(findings.length, 1);
 });
