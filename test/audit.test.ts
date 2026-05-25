@@ -24,9 +24,11 @@ test("runAudit reports coverage stats over the supplied code files", async () =>
       codeFiles: ["src/a.ts", "src/b.ts"],
       fetch: async () => ({ status: 200 }),
     });
-    assert.equal(report.coverage.covered, 1);
+    assert.equal(report.coverage.explicit, 1);
+    assert.equal(report.coverage.wildcardOnly, 0);
+    assert.equal(report.coverage.uncovered, 1);
     assert.equal(report.coverage.total, 2);
-    assert.deepEqual(report.coverage.undocumented, ["src/b.ts"]);
+    assert.deepEqual(report.coverage.uncoveredFiles, ["src/b.ts"]);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
