@@ -19,15 +19,15 @@ freshdocs is a portable [Agent Skills](https://www.skills.sh) package that syste
 ## Install
 
 ```sh
-npx skills add schrmm/freshdocs -g -a codex -s freshdocs -y --copy
+npx skills add schrmm/freshdocs
 ```
 
-That is the primary install path for Codex. It installs the skill into `~/.agents/skills/freshdocs` with the pre-built `dist/` CLIs included; no global npm install is required.
+That is the whole install path. `skills.sh` will ask which agent harness and scope to use; choose Codex when installing for Codex. The installed skill includes the pre-built `dist/` CLIs, so no global npm install is required.
 
-Other agent harnesses can use the same installer with a different `--agent` value, or omit `--agent` for the interactive harness picker:
+For non-interactive Codex setup:
 
 ```sh
-npx skills add schrmm/freshdocs
+npx skills add schrmm/freshdocs --agent codex --yes
 ```
 
 Optional: install as an npm package only if you want `doc-gate` and `freshdocs-audit` directly on PATH everywhere:
@@ -55,7 +55,7 @@ freshdocs-install-commands --claude
 
 Codex does not load arbitrary third-party slash commands from those templates. Use `/skills` or mention `$freshdocs` after installing the skill. The package also includes `.codex-plugin/plugin.json`, so freshdocs can be distributed as a Codex plugin rather than only as a loose skill.
 
-The hook itself resolves `doc-gate` at runtime in four tiers: PATH → `node_modules/.bin/` → project `.agents/skills/freshdocs/dist/cli-main.cjs` → global `~/.agents/skills/freshdocs/dist/cli-main.cjs` via `node`. The first one that exists wins.
+The hook itself resolves `doc-gate` at runtime in this order: PATH → `node_modules/.bin/` → project `.agents/skills/freshdocs/dist/cli-main.cjs` → global `~/.codex/skills/freshdocs/dist/cli-main.cjs` → global `~/.agents/skills/freshdocs/dist/cli-main.cjs` via `node`. The first one that exists wins.
 
 ## What it detects
 
@@ -76,7 +76,7 @@ Agent-facing docs (`docs/agents/**`, `CLAUDE.md`, `AGENTS.md`, `CONTEXT.md`) **f
 ### A. Onboarding sweep (primary entry, fresh repo)
 
 ```
-1. npx skills add schrmm/freshdocs -g -a codex -s freshdocs -y --copy
+1. npx skills add schrmm/freshdocs
 2. freshdocs-install-commands             # one-time, global command templates
 3. freshdocs-install-hook                 # per-repo, wire pre-commit
 4. freshdocs-audit --init --apply         # bootstrap empty docmeta blocks

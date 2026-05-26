@@ -13,7 +13,8 @@ Run the documentation health audit for this repo.
    - `freshdocs-audit` on PATH (optional npm install), OR
    - `node_modules/.bin/freshdocs-audit` (local npm install), OR
    - `node .agents/skills/freshdocs/dist/audit-cli.cjs` (project skill install), OR
-   - `node ~/.agents/skills/freshdocs/dist/audit-cli.cjs` (global skill install).
+   - `node ~/.codex/skills/freshdocs/dist/audit-cli.cjs` (Codex global skill install), OR
+   - `node ~/.agents/skills/freshdocs/dist/audit-cli.cjs` (portable global skill install).
    It accepts no arguments and operates on the current working directory.
 2. Present the report grouped by section:
    - **Coverage** — `covered/total (percent%)`, plus the top undocumented files.
