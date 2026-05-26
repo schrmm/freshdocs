@@ -1,7 +1,7 @@
 ---
 audience: agent
 covers: ["src/reporter.ts"]
-synced: eb07b47d0dee16b0a0b4e7406c2566cd61439ddc
+synced: b99a2f4d417555178bb8c1f0652d052e4dcc46dc
 reviewed: 2026-05-26
 review_interval: 30d
 ---
@@ -14,7 +14,7 @@ Pure render layer for the gate. Takes the composed `Finding[]` and an optional n
 
 ```ts
 function formatReport(findings: Finding[], opts?: ReportOptions): Report;
-interface ReportOptions { ungatedCount?: number }
+interface ReportOptions { ungatedCount?: number; noBehaviorChange?: boolean }
 interface Report { exitCode: number; output: string }
 ```
 
@@ -45,12 +45,22 @@ Exit code:
 `opts.ungatedCount` is the count of repo docs missing `docmeta:` frontmatter — surfaced by the audit's `buildIndex(...).ungated`. When non-zero:
 
 ```
-note: 4 un-gated docs have no docmeta — run /doc-audit --init to bootstrap.
+note: 4 un-gated docs have no docmeta — run freshdocs-audit --init to bootstrap.
 ```
 
 Appended *after* the headline (clean case) or *after* the findings list (issues case). Singular/plural toggle on the count (`1` → "doc has", others → "docs have").
 
 `ungatedCount` of `undefined`, `0`, or omitted → no nudge.
+
+## Non-behavior override note
+
+When `opts.noBehaviorChange` is true, the report appends:
+
+```
+note: non-behavior-change override active — drift findings are warnings; link failures still block.
+```
+
+The reporter only prints the note. The caller is responsible for downgrading drift findings before rendering.
 
 ## Gotchas
 

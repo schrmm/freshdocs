@@ -5,6 +5,8 @@
 #   2. node_modules/.bin/doc-gate     (local npm install)
 #   3. .agents/skills/freshdocs/dist/ (vendored by `npx skills add`)
 # Blocks the commit when staged code drifts from an agent-facing doc.
+# Set FRESHDOCS_NO_BEHAVIOR_CHANGE=1 to downgrade drift to warnings for
+# explicitly non-behavioral commits; broken links still block.
 
 if command -v doc-gate >/dev/null 2>&1; then
   exec doc-gate

@@ -34,7 +34,14 @@ test("appends an un-gated nudge when un-gated docs exist", () => {
   const { output, exitCode } = formatReport([], { ungatedCount: 3 });
   assert.equal(exitCode, 0); // never blocks
   assert.match(output, /3 un-gated/);
-  assert.match(output, /--init|doc-audit/i);
+  assert.match(output, /freshdocs-audit --init/i);
+});
+
+test("reports when the non-behavior-change override is active", () => {
+  const { output, exitCode } = formatReport([warn], { noBehaviorChange: true });
+  assert.equal(exitCode, 0);
+  assert.match(output, /non-behavior-change override active/i);
+  assert.match(output, /link failures still block/i);
 });
 
 test("no nudge line when ungatedCount is 0 or omitted", () => {

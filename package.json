@@ -10,8 +10,13 @@
     "freshdocs-install-hook": "dist/install-hook-cli.cjs"
   },
   "files": [
+    ".codex-plugin",
+    ".agents",
+    "AGENTS.md",
+    "agents",
     "dist",
     "SKILL.md",
+    "skills",
     "commands",
     "hooks",
     "README.md"
@@ -33,7 +38,7 @@
     "skills.sh"
   ],
   "scripts": {
-    "build": "npx -y esbuild src/cli-main.ts src/audit-cli.ts src/install-commands-cli.ts src/install-hook-cli.ts --bundle --platform=node --format=cjs --target=node22 --outdir=dist --out-extension:.js=.cjs",
+    "build": "node scripts/build.mjs",
     "test": "node --import tsx --test \"test/**/*.test.ts\"",
     "typecheck": "tsc --noEmit",
     "prepare": "npm run build"

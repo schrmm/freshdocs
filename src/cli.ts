@@ -76,6 +76,16 @@ export interface GateOptions {
   previousFingerprint?: Fingerprint | null;
   /** Files newly created (git status A) in this change set. Default: empty (no uncovered check). */
   newlyAddedFiles?: string[];
+  /** Downgrade drift failures to warnings when the staged code change is explicitly non-behavioral. */
+  noBehaviorChange?: boolean;
+}
+
+function applyNoBehaviorChange(findings: ReturnType<typeof detect>): ReturnType<typeof detect> {
+  return findings.map((finding) => (
+    finding.kind === "drift" && finding.severity === "fail"
+      ? { ...finding, severity: "warn" }
+      : finding
+  ));
 }
 
 /** Compose the gate over an already-resolved change set. */
@@ -106,5 +116,9 @@ export function runGate(repoRoot: string, changedFiles: string[], opts: GateOpti
     ...structural,
     ...uncovered,
   ];
-  return formatReport(findings, { ungatedCount: index.ungated.length });
+  const reportedFindings = opts.noBehaviorChange ? applyNoBehaviorChange(findings) : findings;
+  return formatReport(reportedFindings, {
+    ungatedCount: index.ungated.length,
+    noBehaviorChange: opts.noBehaviorChange,
+  });
 }

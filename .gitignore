@@ -1,5 +1,8 @@
 node_modules/
 *.log
 .DS_Store
-.agents/
+.agents/*
+!.agents/commands/
+!.agents/commands/freshdocs/
+!.agents/commands/freshdocs/*.md
 skills-lock.json

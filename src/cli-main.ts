@@ -31,6 +31,7 @@ function gitNewlyAddedFiles(cwd: string): string[] {
 const cwd = process.cwd();
 const { exitCode, output } = runGate(cwd, gitStagedFiles(cwd), {
   newlyAddedFiles: gitNewlyAddedFiles(cwd),
+  noBehaviorChange: process.argv.includes("--no-behavior-change") || process.env.FRESHDOCS_NO_BEHAVIOR_CHANGE === "1",
 });
 process.stdout.write(`${output}\n`);
 process.exit(exitCode);

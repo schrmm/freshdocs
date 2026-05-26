@@ -44,7 +44,7 @@ Resolution & safety:
    - "Is a freshdocs hook" = the file contains the literal string `freshdocs documentation gate (pre-commit)` (constant `FRESHDOCS_HOOK_MARKER`). The marker lives in `hooks/pre-commit`'s comment header — do not rename it without updating both files.
 5. `chmodSync(target, 0o755)` — wrapped in try/catch because Windows throws on chmod (no-op there; `cmd`/`bash` shims use `.cmd` extension anyway).
 
-The hook itself, once installed, resolves `doc-gate` at runtime in three tiers (PATH → `node_modules/.bin/` → `.agents/skills/freshdocs/dist/cli-main.cjs`). That logic is in `hooks/pre-commit`, not in this bin.
+The hook itself, once installed, resolves `doc-gate` at runtime in three tiers (PATH → `node_modules/.bin/` → `.agents/skills/freshdocs/dist/cli-main.cjs`). That logic is in `hooks/pre-commit`, not in this bin. The hook also honors `FRESHDOCS_NO_BEHAVIOR_CHANGE=1`, which downgrades drift findings to warnings for explicitly non-behavioral commits while leaving broken-link failures intact.
 
 ## Gotchas
 

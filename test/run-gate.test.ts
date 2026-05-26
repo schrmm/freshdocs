@@ -41,6 +41,20 @@ test("runGate passes (exit 0) when the doc is updated alongside the code", () =>
   }
 });
 
+test("runGate: non-behavior-change downgrades drift failures to warnings", () => {
+  const root = fixture({
+    "docs/agents/api.md": "---\ncovers: [\"src/api/**\"]\nsynced: abc\n---\nguide",
+  });
+  try {
+    const { exitCode, output } = runGate(root, ["src/api/users.ts"], { noBehaviorChange: true });
+    assert.equal(exitCode, 0);
+    assert.match(output, /WARN\s+docs\/agents\/api\.md/);
+    assert.match(output, /non-behavior-change override active/i);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test("runGate fails when a changed doc has a broken internal link", () => {
   const root = fixture({
     "docs/a.md": "see [gone](./missing.md)",
@@ -50,6 +64,20 @@ test("runGate fails when a changed doc has a broken internal link", () => {
     const { exitCode, output } = runGate(root, ["docs/a.md"]);
     assert.equal(exitCode, 1);
     assert.match(output, /missing\.md/);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("runGate: non-behavior-change does not downgrade broken links", () => {
+  const root = fixture({
+    "docs/a.md": "see [gone](./missing.md)",
+  });
+  try {
+    const { exitCode, output } = runGate(root, ["docs/a.md"], { noBehaviorChange: true });
+    assert.equal(exitCode, 1);
+    assert.match(output, /FAIL\s+docs\/a\.md/);
+    assert.match(output, /non-behavior-change override active/i);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

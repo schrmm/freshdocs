@@ -9126,6 +9126,10 @@ function inferAudience(relPath) {
   return "human";
 }
 
+// src/repo-policy.ts
+var IGNORED_DIRS = /* @__PURE__ */ new Set(["node_modules", "dist", ".git", ".agents"]);
+var DEFAULT_CODE_PREFIXES = ["src/", "lib/", "app/", "packages/"];
+
 // src/docmeta-index.ts
 var FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---/;
 function asString(value) {
@@ -9160,7 +9164,6 @@ function parseDocmeta(content, relPath) {
     }
   };
 }
-var IGNORED_DIRS = /* @__PURE__ */ new Set(["node_modules", "dist", ".git", ".agents"]);
 function* walkMarkdown(root, dir) {
   for (const dirent of (0, import_node_fs.readdirSync)(dir, { withFileTypes: true })) {
     if (dirent.isDirectory()) {
@@ -9299,13 +9302,12 @@ function externalUrlsFrom(docs) {
 // src/repo-files.ts
 var import_node_fs2 = require("node:fs");
 var import_node_path3 = require("node:path");
-var IGNORED_DIRS2 = /* @__PURE__ */ new Set(["node_modules", "dist", ".git", ".agents"]);
 function listFiles(repoRoot) {
   const files = /* @__PURE__ */ new Set();
   const walk = (dir) => {
     for (const dirent of (0, import_node_fs2.readdirSync)(dir, { withFileTypes: true })) {
       if (dirent.isDirectory()) {
-        if (!IGNORED_DIRS2.has(dirent.name)) walk((0, import_node_path3.join)(dir, dirent.name));
+        if (!IGNORED_DIRS.has(dirent.name)) walk((0, import_node_path3.join)(dir, dirent.name));
       } else if (dirent.isFile()) {
         const rel = (0, import_node_path3.join)(dir, dirent.name).slice(repoRoot.length + 1).split(import_node_path3.sep).join("/");
         files.add(rel);
@@ -9350,12 +9352,11 @@ function deadlineFor(entry) {
 function isoDate(d) {
   return d.toISOString().slice(0, 10);
 }
-var CODE_PREFIXES = ["src/", "lib/", "app/", "packages/"];
 function defaultCodeFiles(existing) {
   const out = [];
   for (const path of existing) {
     if (path.endsWith(".md")) continue;
-    if (!CODE_PREFIXES.some((p) => path.startsWith(p))) continue;
+    if (!DEFAULT_CODE_PREFIXES.some((p) => path.startsWith(p))) continue;
     out.push(path);
   }
   return out;

@@ -23,7 +23,7 @@ export interface InitOptions {
  * Propose (and optionally write) `docmeta` frontmatter for every doc the index
  * marks as un-gated. The proposal is intentionally conservative: audience is
  * inferred from path, `covers` is left empty, and time fields are omitted.
- * Filling in meaningful `covers` is the LLM's job during /update-docs --init.
+ * Filling in meaningful `covers` is the LLM's job after freshdocs-audit --init.
  */
 export function initDocmeta(repoRoot: string, opts: InitOptions = {}): InitResult {
   const index = buildIndex(repoRoot);

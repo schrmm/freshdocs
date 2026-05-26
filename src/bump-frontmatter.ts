@@ -8,8 +8,8 @@ export interface BumpFields {
 /**
  * Update or insert `synced` and `reviewed` keys inside the frontmatter block
  * while preserving every other line and the body. Returns the input unchanged
- * when the doc has no frontmatter (un-gated docs are repaired by /doc-audit
- * --init in slice #7, not here).
+ * when the doc has no frontmatter (un-gated docs are repaired by
+ * freshdocs-audit --init, not here).
  */
 export function bumpFrontmatter(content: string, fields: BumpFields): string {
   const match = content.match(FRONTMATTER);

@@ -1,7 +1,7 @@
 ---
 audience: agent
 covers: ["src/audience.ts", "src/docmeta-index.ts", "src/init-docmeta.ts", "src/write-frontmatter.ts", "src/repo-files.ts", "src/repo-policy.ts"]
-synced: eb07b47d0dee16b0a0b4e7406c2566cd61439ddc
+synced: b99a2f4d417555178bb8c1f0652d052e4dcc46dc
 reviewed: 2026-05-26
 review_interval: 30d
 ---
@@ -59,7 +59,7 @@ interface InitResult { proposals: InitProposal[]; written: string[] }
 - Builds an index, then maps `ungated` → `{ path, init: { audience: inferAudience(path), covers: [] } }`.
 - `dryRun: true` → return proposals only, no writes.
 - Default → for each proposal, read the file, run `writeFrontmatter`, write back if the content changed. `written` reports paths actually modified.
-- `covers` is deliberately left empty: filling it is the LLM's job during `/update-docs --init`.
+- `covers` is deliberately left empty: filling it is the LLM's job after `freshdocs-audit --init`.
 
 Invoked by the audit CLI's `--init` (and `--init --apply`) flags.
 

@@ -9130,6 +9130,10 @@ function inferAudience(relPath) {
   return "human";
 }
 
+// src/repo-policy.ts
+var IGNORED_DIRS = /* @__PURE__ */ new Set(["node_modules", "dist", ".git", ".agents"]);
+var DEFAULT_CODE_PREFIXES = ["src/", "lib/", "app/", "packages/"];
+
 // src/docmeta-index.ts
 var FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---/;
 function asString(value) {
@@ -9164,7 +9168,6 @@ function parseDocmeta(content, relPath) {
     }
   };
 }
-var IGNORED_DIRS = /* @__PURE__ */ new Set(["node_modules", "dist", ".git", ".agents"]);
 function* walkMarkdown(root, dir) {
   for (const dirent of (0, import_node_fs.readdirSync)(dir, { withFileTypes: true })) {
     if (dirent.isDirectory()) {
@@ -9214,7 +9217,6 @@ function detect({ changedFiles, index }) {
   }
   return findings;
 }
-var DEFAULT_CODE_PREFIXES = ["src/", "lib/", "app/", "packages/"];
 function detectUncovered({
   newlyAddedFiles,
   index,
@@ -9300,16 +9302,21 @@ var MARKER = {
 };
 function nudge(count) {
   if (!count) return null;
-  return `note: ${count} un-gated doc${count === 1 ? "" : "s"} have no docmeta \u2014 run /doc-audit --init to bootstrap.`;
+  return `note: ${count} un-gated doc${count === 1 ? "" : "s"} have no docmeta \u2014 run freshdocs-audit --init to bootstrap.`;
+}
+function noBehaviorChangeNote(active) {
+  return active ? "note: non-behavior-change override active \u2014 drift findings are warnings; link failures still block." : null;
 }
 function formatReport(findings, opts = {}) {
   const nudgeLine = nudge(opts.ungatedCount);
+  const overrideLine = noBehaviorChangeNote(opts.noBehaviorChange);
+  const notes = [overrideLine, nudgeLine].filter((line) => line !== null);
   if (findings.length === 0) {
     const headline = "freshdocs: docs up to date \u2014 no issues detected.";
     return {
       exitCode: 0,
-      output: nudgeLine ? `${headline}
-${nudgeLine}` : headline
+      output: notes.length > 0 ? `${headline}
+${notes.join("\n")}` : headline
     };
   }
   const lines = findings.map(
@@ -9317,20 +9324,19 @@ ${nudgeLine}` : headline
   );
   const hasFailure = findings.some((f) => f.severity === "fail");
   const out = ["freshdocs: documentation issues detected", ...lines];
-  if (nudgeLine) out.push(nudgeLine);
+  out.push(...notes);
   return { exitCode: hasFailure ? 1 : 0, output: out.join("\n") };
 }
 
 // src/repo-files.ts
 var import_node_fs2 = require("node:fs");
 var import_node_path3 = require("node:path");
-var IGNORED_DIRS2 = /* @__PURE__ */ new Set(["node_modules", "dist", ".git", ".agents"]);
 function listFiles(repoRoot) {
   const files = /* @__PURE__ */ new Set();
   const walk = (dir) => {
     for (const dirent of (0, import_node_fs2.readdirSync)(dir, { withFileTypes: true })) {
       if (dirent.isDirectory()) {
-        if (!IGNORED_DIRS2.has(dirent.name)) walk((0, import_node_path3.join)(dir, dirent.name));
+        if (!IGNORED_DIRS.has(dirent.name)) walk((0, import_node_path3.join)(dir, dirent.name));
       } else if (dirent.isFile()) {
         const rel = (0, import_node_path3.join)(dir, dirent.name).slice(repoRoot.length + 1).split(import_node_path3.sep).join("/");
         files.add(rel);
@@ -9385,7 +9391,7 @@ var isMacroDoc = (path) => MACRO_PATTERNS.some((re) => re.test(path));
 function readShape(repoRoot) {
   const topLevel = [];
   for (const dirent of (0, import_node_fs3.readdirSync)(repoRoot, { withFileTypes: true })) {
-    if (dirent.isDirectory() && !IGNORED_DIRS2.has(dirent.name) && !dirent.name.startsWith(".")) {
+    if (dirent.isDirectory() && !IGNORED_DIRS.has(dirent.name) && !dirent.name.startsWith(".")) {
       topLevel.push(dirent.name);
     }
   }
@@ -9407,7 +9413,7 @@ function readHeadShape(repoRoot) {
       const match = line.match(/^\d+\s+(\w+)\s+\S+\s+(.+)$/);
       if (match && match[1] === "tree") {
         const name = match[2];
-        if (!IGNORED_DIRS2.has(name) && !name.startsWith(".")) topLevel.push(name);
+        if (!IGNORED_DIRS.has(name) && !name.startsWith(".")) topLevel.push(name);
       }
     }
     let scripts = [];
@@ -9423,6 +9429,9 @@ function readHeadShape(repoRoot) {
   } catch {
     return null;
   }
+}
+function applyNoBehaviorChange(findings) {
+  return findings.map((finding) => finding.kind === "drift" && finding.severity === "fail" ? { ...finding, severity: "warn" } : finding);
 }
 function runGate(repoRoot, changedFiles, opts = {}) {
   const index = buildIndex(repoRoot);
@@ -9441,7 +9450,11 @@ function runGate(repoRoot, changedFiles, opts = {}) {
     ...structural,
     ...uncovered
   ];
-  return formatReport(findings, { ungatedCount: index.ungated.length });
+  const reportedFindings = opts.noBehaviorChange ? applyNoBehaviorChange(findings) : findings;
+  return formatReport(reportedFindings, {
+    ungatedCount: index.ungated.length,
+    noBehaviorChange: opts.noBehaviorChange
+  });
 }
 
 // src/cli-main.ts
@@ -9463,7 +9476,8 @@ function gitNewlyAddedFiles(cwd2) {
 }
 var cwd = process.cwd();
 var { exitCode, output } = runGate(cwd, gitStagedFiles(cwd), {
-  newlyAddedFiles: gitNewlyAddedFiles(cwd)
+  newlyAddedFiles: gitNewlyAddedFiles(cwd),
+  noBehaviorChange: process.argv.includes("--no-behavior-change") || process.env.FRESHDOCS_NO_BEHAVIOR_CHANGE === "1"
 });
 process.stdout.write(`${output}
 `);

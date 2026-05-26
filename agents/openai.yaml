@@ -1,0 +1,4 @@
+interface:
+  display_name: "freshdocs"
+  short_description: "Find and repair documentation drift."
+  default_prompt: "Run a freshdocs audit for this repo."
