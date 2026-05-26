@@ -19,19 +19,22 @@ freshdocs is a portable [Agent Skills](https://www.skills.sh) package that syste
 ## Install
 
 ```sh
-# As an Agent Skill (recommended for Claude Code / Pi / Cursor / etc.):
-npx skills add schrmm/freshdocs
-
-# For Codex specifically, install the same skill into Codex's .agents layout:
-npx skills add schrmm/freshdocs --agent codex
-
-# As an npm package (gives you doc-gate and freshdocs-audit on PATH):
-npm install -g github:schrmm/freshdocs
-# or
-pnpm add -g github:schrmm/freshdocs
+npx skills add schrmm/freshdocs -g -a codex -s freshdocs -y --copy
 ```
 
-Either install path is self-contained: `npx skills add` vendors a pre-built `dist/` (no `npm install` needed); `npm install -g github:` runs a `prepare` script that bundles the two bins with `npx esbuild` (works on Windows where `node_modules/.bin/` isn't on PATH during prepare).
+That is the primary install path for Codex. It installs the skill into `~/.agents/skills/freshdocs` with the pre-built `dist/` CLIs included; no global npm install is required.
+
+Other agent harnesses can use the same installer with a different `--agent` value, or omit `--agent` for the interactive harness picker:
+
+```sh
+npx skills add schrmm/freshdocs
+```
+
+Optional: install as an npm package only if you want `doc-gate` and `freshdocs-audit` directly on PATH everywhere:
+
+```sh
+npm install -g github:schrmm/freshdocs
+```
 
 ### Wire it up
 
@@ -52,7 +55,7 @@ freshdocs-install-commands --claude
 
 Codex does not load arbitrary third-party slash commands from those templates. Use `/skills` or mention `$freshdocs` after installing the skill. The package also includes `.codex-plugin/plugin.json`, so freshdocs can be distributed as a Codex plugin rather than only as a loose skill.
 
-The hook itself resolves `doc-gate` at runtime in three tiers: PATH → `node_modules/.bin/` → `.agents/skills/freshdocs/dist/cli-main.cjs` via `node`. The first one that exists wins.
+The hook itself resolves `doc-gate` at runtime in four tiers: PATH → `node_modules/.bin/` → project `.agents/skills/freshdocs/dist/cli-main.cjs` → global `~/.agents/skills/freshdocs/dist/cli-main.cjs` via `node`. The first one that exists wins.
 
 ## What it detects
 
@@ -73,7 +76,7 @@ Agent-facing docs (`docs/agents/**`, `CLAUDE.md`, `AGENTS.md`, `CONTEXT.md`) **f
 ### A. Onboarding sweep (primary entry, fresh repo)
 
 ```
-1. npx skills add schrmm/freshdocs       # vendors skill + bins
+1. npx skills add schrmm/freshdocs -g -a codex -s freshdocs -y --copy
 2. freshdocs-install-commands             # one-time, global command templates
 3. freshdocs-install-hook                 # per-repo, wire pre-commit
 4. freshdocs-audit --init --apply         # bootstrap empty docmeta blocks

@@ -13,7 +13,7 @@ You are repairing documentation discrepancies for this repo.
 2. Gather the current findings:
    - Run `doc-gate` against the staged change set (or the diff being prepared). Capture its `Finding[]`.
    - If the user invoked this command outside a commit context, run `freshdocs-audit` instead and use its report.
-   - Bin resolution for both: try `doc-gate` / `freshdocs-audit` on PATH first; fall back to `node_modules/.bin/...`; final fallback `node .agents/skills/freshdocs/dist/cli-main.cjs` (or `audit-cli.cjs`) when freshdocs was installed via `npx skills add`.
+   - Bin resolution for both: try `doc-gate` / `freshdocs-audit` on PATH first; fall back to `node_modules/.bin/...`; then `node .agents/skills/freshdocs/dist/cli-main.cjs` (or `audit-cli.cjs`) for project installs; final fallback `node ~/.agents/skills/freshdocs/dist/cli-main.cjs` (or `audit-cli.cjs`) for global installs.
    - Repo shape and code-surface defaults come from freshdocs' shared repo policy; only reconcile findings the tool reports.
    - If the user explicitly marks the change non-behavioral, `FRESHDOCS_NO_BEHAVIOR_CHANGE=1` downgrades drift findings to warnings in the pre-commit hook. Manual gate runs can use `doc-gate --no-behavior-change`. Broken links still fail.
 3. Walk every finding in the order defined by the skill (drift → broken links → macro staleness → overdue reviews → external links).

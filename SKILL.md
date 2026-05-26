@@ -31,7 +31,7 @@ Run the tooling first to get a precise list of work, then judge from there:
 - **Non-behavior changes:** `FRESHDOCS_NO_BEHAVIOR_CHANGE=1` downgrades drift findings to warnings in the pre-commit hook, but broken links still fail. Manual gate runs can use `doc-gate --no-behavior-change`.
 - The `## Agent skills` block in `AGENTS.md` / `CLAUDE.md` tells you the repo's issue tracker, triage label vocabulary, and docs layout — read it before proposing consolidation.
 
-**Bin resolution.** Both bins resolve in this order: (1) on PATH (`doc-gate`, `freshdocs-audit` — installed by `npm i -g github:schrmm/freshdocs`); (2) `node_modules/.bin/`; (3) `node .agents/skills/freshdocs/dist/cli-main.cjs` / `audit-cli.cjs` when the skill was installed via `npx skills add schrmm/freshdocs`. Use the first one that works.
+**Bin resolution.** Both bins resolve in this order: (1) on PATH (`doc-gate`, `freshdocs-audit` — optional npm install); (2) `node_modules/.bin/`; (3) `node .agents/skills/freshdocs/dist/cli-main.cjs` / `audit-cli.cjs` for a project skill install; (4) `node ~/.agents/skills/freshdocs/dist/cli-main.cjs` / `audit-cli.cjs` for a global skill install. Use the first one that works.
 
 ## The repair loop
 

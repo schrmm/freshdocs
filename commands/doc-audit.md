@@ -10,9 +10,10 @@ review_interval: 30d
 Run the documentation health audit for this repo.
 
 1. Invoke the audit. Resolve the bin in this order:
-   - `freshdocs-audit` on PATH (global npm install), OR
+   - `freshdocs-audit` on PATH (optional npm install), OR
    - `node_modules/.bin/freshdocs-audit` (local npm install), OR
-   - `node .agents/skills/freshdocs/dist/audit-cli.cjs` (vendored by `npx skills add`).
+   - `node .agents/skills/freshdocs/dist/audit-cli.cjs` (project skill install), OR
+   - `node ~/.agents/skills/freshdocs/dist/audit-cli.cjs` (global skill install).
    It accepts no arguments and operates on the current working directory.
 2. Present the report grouped by section:
    - **Coverage** — `covered/total (percent%)`, plus the top undocumented files.

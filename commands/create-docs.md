@@ -17,7 +17,7 @@ You are authoring missing documentation for this repo.
    - **Argument is a doc path** → scaffold at that path. For `docs/workflows/<name>.md` and `docs/overview.md`, scaffold a structured outline and ask the user to fill the prose.
 
 3. **Audit first.** Run `freshdocs-audit` and capture `uncovered` + `wildcardOnly` lists, plus full file paths.
-   - Bin resolution: try `freshdocs-audit` on PATH; fall back to `node_modules/.bin/freshdocs-audit`; final fallback `node .agents/skills/freshdocs/dist/audit-cli.cjs`.
+   - Bin resolution: try `freshdocs-audit` on PATH; fall back to `node_modules/.bin/freshdocs-audit`; then `node .agents/skills/freshdocs/dist/audit-cli.cjs`; final fallback `node ~/.agents/skills/freshdocs/dist/audit-cli.cjs`.
    - The default code surface comes from freshdocs' shared repo policy (`src/`, `lib/`, `app/`, `packages/`); targeted mode can still operate on an explicit source path outside that set.
 
 4. **Sweep mode: cluster and propose.**
