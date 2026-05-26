@@ -24,6 +24,8 @@ npx skills add schrmm/freshdocs
 
 That is the whole install path. `skills.sh` will ask which agent harness and scope to use; choose Codex when installing for Codex. The installed skill includes the pre-built `dist/` CLIs, so no global npm install is required.
 
+In Codex, freshdocs appears as a skill, not as a slash command. Start a new Codex session if it was installed while Codex was already running, then use `/skills` or type `$freshdocs` to invoke it.
+
 Optional: install as an npm package only if you want `doc-gate` and `freshdocs-audit` directly on PATH everywhere:
 
 ```sh
@@ -47,7 +49,7 @@ freshdocs-install-commands --claude
 
 `freshdocs-install-hook` refuses to clobber a non-freshdocs `pre-commit` hook; pass `--force` to override. `freshdocs-install-commands` installs the agent-neutral command templates by default; pass `--claude` only when you want the Claude Code slash-command adapter. Both bins resolve their source files (`hooks/pre-commit`, `commands/*.md`) from wherever freshdocs is installed — works for both `npx skills add` and `npm i -g github:` layouts.
 
-Codex does not load arbitrary third-party slash commands from those templates. Use `/skills` or mention `$freshdocs` after installing the skill. The package also includes `.codex-plugin/plugin.json`, so freshdocs can be distributed as a Codex plugin rather than only as a loose skill.
+Codex does not load arbitrary third-party slash commands from those templates. The `/freshdocs:doc-audit`, `/freshdocs:update-docs`, and `/freshdocs:create-docs` templates are for hosts that support Markdown command templates, such as Claude Code. In Codex, use `/skills` or mention `$freshdocs`; restart Codex or start a new session if the skill was installed while Codex was already running. The package also includes `.codex-plugin/plugin.json`, so freshdocs can be distributed as a Codex plugin rather than only as a loose skill.
 
 The hook itself resolves `doc-gate` at runtime in this order: PATH → `node_modules/.bin/` → project `.agents/skills/freshdocs/dist/cli-main.cjs` → global `~/.codex/skills/freshdocs/dist/cli-main.cjs` → global `~/.agents/skills/freshdocs/dist/cli-main.cjs` via `node`. The first one that exists wins.
 
