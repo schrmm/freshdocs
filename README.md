@@ -24,12 +24,6 @@ npx skills add schrmm/freshdocs
 
 That is the whole install path. `skills.sh` will ask which agent harness and scope to use; choose Codex when installing for Codex. The installed skill includes the pre-built `dist/` CLIs, so no global npm install is required.
 
-For non-interactive Codex setup:
-
-```sh
-npx skills add schrmm/freshdocs --agent codex --yes
-```
-
 Optional: install as an npm package only if you want `doc-gate` and `freshdocs-audit` directly on PATH everywhere:
 
 ```sh
