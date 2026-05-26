@@ -10,13 +10,10 @@
     "freshdocs-install-hook": "dist/install-hook-cli.cjs"
   },
   "files": [
-    ".codex-plugin",
     ".agents",
     "AGENTS.md",
-    "agents",
     "dist",
     "SKILL.md",
-    "skills",
     "commands",
     "hooks",
     "README.md"

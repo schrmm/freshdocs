@@ -33,7 +33,6 @@ Add or update Node test-runner tests in `test/` when behavior changes. Keep test
 Canonical portable agent assets belong in this repository, not in a vendor-only folder:
 
 - `SKILL.md` is the installable Agent Skill entrypoint for `skills.sh`.
-- `.codex-plugin/plugin.json` makes the skill distributable as a Codex plugin.
 - `commands/` contains reusable command prompt templates.
 - `freshdocs-install-commands` installs command templates to `~/.agents/commands/freshdocs` by default. Use `--claude` only for the Claude Code slash-command adapter.
 

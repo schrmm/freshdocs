@@ -49,7 +49,7 @@ freshdocs-install-commands --claude
 
 `freshdocs-install-hook` refuses to clobber a non-freshdocs `pre-commit` hook; pass `--force` to override. `freshdocs-install-commands` installs the agent-neutral command templates by default; pass `--claude` only when you want the Claude Code slash-command adapter. Both bins resolve their source files (`hooks/pre-commit`, `commands/*.md`) from wherever freshdocs is installed — works for both `npx skills add` and `npm i -g github:` layouts.
 
-Codex does not load arbitrary third-party slash commands from those templates. The `/freshdocs:doc-audit`, `/freshdocs:update-docs`, and `/freshdocs:create-docs` templates are for hosts that support Markdown command templates, such as Claude Code. In Codex, use `/skills` or mention `$freshdocs`; restart Codex or start a new session if the skill was installed while Codex was already running. The package also includes `.codex-plugin/plugin.json`, so freshdocs can be distributed as a Codex plugin rather than only as a loose skill.
+Codex does not load arbitrary third-party slash commands from those templates. The `/freshdocs:doc-audit`, `/freshdocs:update-docs`, and `/freshdocs:create-docs` templates are for hosts that support Markdown command templates, such as Claude Code. In Codex, use `/skills` or mention `$freshdocs`; restart Codex or start a new session if the skill was installed while Codex was already running.
 
 The hook itself resolves `doc-gate` at runtime in this order: PATH → `node_modules/.bin/` → project `.agents/skills/freshdocs/dist/cli-main.cjs` → global `~/.codex/skills/freshdocs/dist/cli-main.cjs` → global `~/.agents/skills/freshdocs/dist/cli-main.cjs` via `node`. The first one that exists wins.
 
@@ -148,7 +148,7 @@ freshdocs-audit --init --apply   # write conservative docmeta to un-annotated do
 - **`/freshdocs:update-docs`** — invokes the `freshdocs` skill to reconcile flagged docs.
 - **`/freshdocs:create-docs`** — drafts missing docs from audit coverage gaps.
 
-The skill itself (`SKILL.md`) is the judgment layer. It is automatically loaded by hosts that follow the Agent Skills standard when matching the description. Codex discovers installed skills in `.agents/skills` and can receive freshdocs as a Codex plugin through `.codex-plugin/plugin.json`.
+The skill itself (`SKILL.md`) is the judgment layer. It is automatically loaded by hosts that follow the Agent Skills standard when matching the description.
 
 ## What freshdocs replaces — and what it doesn't
 
