@@ -3,8 +3,8 @@ name: freshdocs
 description: Reconcile documentation discrepancies surfaced by the freshdocs gate or audit — drift, broken links, consolidation needs, overdue reviews. Use when /update-docs is invoked, when the doc-gate has failed a commit, or when /doc-audit reports findings. Cooperates with grill-with-docs (CONTEXT.md / ADRs are out of scope).
 audience: agent
 covers: ["src/cli.ts", "src/cli-main.ts", "src/detect-engine.ts", "src/structural-fingerprint.ts", "src/link-checker.ts", "src/url-health.ts"]
-synced: 93d6a5f9b2bf7457a389f9079523c7c3621c8145
-reviewed: 2026-05-25
+synced: eb07b47d0dee16b0a0b4e7406c2566cd61439ddc
+reviewed: 2026-05-26
 review_interval: 30d
 ---
 
@@ -27,6 +27,7 @@ Run the tooling first to get a precise list of work, then judge from there:
 
 - **Gate context:** `doc-gate` against the current commit/diff produces `Finding[]` (drift / broken-link / macro-stale).
 - **Audit context:** `freshdocs-audit` produces a snapshot report (coverage, overdue, broken internal links, external link health).
+- **Repo policy:** gate and audit share hardcoded defaults for ignored directories and code-surface prefixes; there is no user-facing config file in v1.
 - The `## Agent skills` block in `AGENTS.md` / `CLAUDE.md` tells you the repo's issue tracker, triage label vocabulary, and docs layout — read it before proposing consolidation.
 
 **Bin resolution.** Both bins resolve in this order: (1) on PATH (`doc-gate`, `freshdocs-audit` — installed by `npm i -g github:schrmm/freshdocs`); (2) `node_modules/.bin/`; (3) `node .agents/skills/freshdocs/dist/cli-main.cjs` / `audit-cli.cjs` when the skill was installed via `npx skills add schrmm/freshdocs`. Use the first one that works.

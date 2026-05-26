@@ -1,6 +1,7 @@
 import picomatch from "picomatch";
 import type { DocIndex } from "./docmeta-index.ts";
 import { isExplicitCover } from "./coverage.ts";
+import { DEFAULT_CODE_PREFIXES } from "./repo-policy.ts";
 
 export type Severity = "fail" | "warn";
 
@@ -45,8 +46,6 @@ export function detect({ changedFiles, index }: DetectInput): Finding[] {
 
   return findings;
 }
-
-export const DEFAULT_CODE_PREFIXES = ["src/", "lib/", "app/", "packages/"] as const;
 
 export interface UncoveredInput {
   /** Files newly created (git status A) in this commit / staged set. */

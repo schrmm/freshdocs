@@ -2,6 +2,7 @@ import { parse as parseYaml } from "yaml";
 import { readdirSync, readFileSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { inferAudience, type Audience } from "./audience.ts";
+import { IGNORED_DIRS } from "./repo-policy.ts";
 
 export type { Audience } from "./audience.ts";
 
@@ -73,8 +74,6 @@ export function parseDocmeta(content: string, relPath: string): ParseResult {
     },
   };
 }
-
-const IGNORED_DIRS = new Set(["node_modules", "dist", ".git", ".agents"]);
 
 function* walkMarkdown(root: string, dir: string): Generator<string> {
   for (const dirent of readdirSync(dir, { withFileTypes: true })) {

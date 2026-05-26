@@ -1,8 +1,8 @@
 ---
 audience: human
 covers: ["src/**"]
-synced: 4c032af559103ae3f661b068529e3a9f2ecb79ac
-reviewed: 2026-05-25
+synced: eb07b47d0dee16b0a0b4e7406c2566cd61439ddc
+reviewed: 2026-05-26
 review_interval: 60d
 ---
 
@@ -168,6 +168,8 @@ Four deep modules behind a thin CLI:
 - `url-health` — external URL HEAD→GET classifier with an injectable fetcher
 
 Plus pure finding-producers (`link-checker`, `coverage`) and pure helpers (`bump-frontmatter`, `write-frontmatter`, `init-docmeta`). 70 behavior-only tests.
+
+Shared repo-shape defaults live in `repo-policy`: ignored directories (`node_modules`, `dist`, `.git`, `.agents`) and the conventional code-surface prefixes (`src/`, `lib/`, `app/`, `packages/`). There is no required config file in v1; those defaults are deliberately boring and hardcoded.
 
 See `docs/specs/2026-05-22-freshdocs-design.md` for the full design rationale, and the issue tracker for the seven implementation slices that built it.
 

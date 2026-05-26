@@ -8,6 +8,7 @@ import {
   type DocFile,
 } from "./link-checker.ts";
 import { listFiles } from "./repo-files.ts";
+import { DEFAULT_CODE_PREFIXES } from "./repo-policy.ts";
 import { urlHealth, type Fetcher, type LinkStatus } from "./url-health.ts";
 import type { Finding } from "./detect-engine.ts";
 
@@ -56,15 +57,11 @@ function isoDate(d: Date): string {
   return d.toISOString().slice(0, 10);
 }
 
-// Conventional "code surface" prefixes. Configs/lockfiles/etc. are deliberately
-// excluded so the coverage percentage stays meaningful. Override via codeFiles.
-const CODE_PREFIXES = ["src/", "lib/", "app/", "packages/"] as const;
-
 function defaultCodeFiles(existing: Set<string>): string[] {
   const out: string[] = [];
   for (const path of existing) {
     if (path.endsWith(".md")) continue;
-    if (!CODE_PREFIXES.some((p) => path.startsWith(p))) continue;
+    if (!DEFAULT_CODE_PREFIXES.some((p) => path.startsWith(p))) continue;
     out.push(path);
   }
   return out;

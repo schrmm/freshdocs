@@ -2,8 +2,8 @@
 description: Run the read-only freshdocs audit and report documentation health (coverage, overdue reviews, broken internal links, external link health). Makes no changes.
 audience: agent
 covers: ["src/audit-cli.ts", "src/audit.ts", "src/coverage.ts"]
-synced: 69373afbae77d4df504631ae1c32a70c792244c1
-reviewed: 2026-05-24
+synced: eb07b47d0dee16b0a0b4e7406c2566cd61439ddc
+reviewed: 2026-05-26
 review_interval: 30d
 ---
 
@@ -16,6 +16,7 @@ Run the documentation health audit for this repo.
    It accepts no arguments and operates on the current working directory.
 2. Present the report grouped by section:
    - **Coverage** — `covered/total (percent%)`, plus the top undocumented files.
+     The default code surface uses freshdocs' shared repo policy (`src/`, `lib/`, `app/`, `packages/`).
    - **Overdue reviews** — docs past their `review_interval`.
    - **Broken internal links** — across every doc, not just changed ones.
    - **External links** — broken URLs (HEAD → GET fallback already applied).

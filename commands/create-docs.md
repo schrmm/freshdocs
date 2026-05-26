@@ -2,8 +2,8 @@
 description: Author missing per-module / workflow / orientation docs. Sweep mode walks all uncovered findings; targeted mode authors a specific unit. Hands off to grill-with-docs for domain-language territory.
 audience: agent
 covers: ["src/audit-cli.ts", "src/audit.ts", "src/coverage.ts", "src/detect-engine.ts"]
-synced: 07066e33e264a1dcd61bb2cdf1604a311fbe16de
-reviewed: 2026-05-25
+synced: eb07b47d0dee16b0a0b4e7406c2566cd61439ddc
+reviewed: 2026-05-26
 review_interval: 30d
 ---
 
@@ -18,6 +18,7 @@ You are authoring missing documentation for this repo.
 
 3. **Audit first.** Run `freshdocs-audit` and capture `uncovered` + `wildcardOnly` lists, plus full file paths.
    - Bin resolution: try `freshdocs-audit` on PATH; fall back to `node_modules/.bin/freshdocs-audit`; final fallback `node .agents/skills/freshdocs/dist/audit-cli.cjs`.
+   - The default code surface comes from freshdocs' shared repo policy (`src/`, `lib/`, `app/`, `packages/`); targeted mode can still operate on an explicit source path outside that set.
 
 4. **Sweep mode: cluster and propose.**
    - Read every source file in the uncovered + wildcard-only sets.

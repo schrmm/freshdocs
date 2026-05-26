@@ -8,7 +8,8 @@ import { buildIndex } from "./docmeta-index.ts";
 import { detect, detectUncovered } from "./detect-engine.ts";
 import { checkInternalLinks, type DocFile } from "./link-checker.ts";
 import { formatReport, type Report } from "./reporter.ts";
-import { IGNORED_DIRS, listFiles } from "./repo-files.ts";
+import { IGNORED_DIRS } from "./repo-policy.ts";
+import { listFiles } from "./repo-files.ts";
 import {
   computeFingerprint,
   diffFingerprints,
@@ -107,4 +108,3 @@ export function runGate(repoRoot: string, changedFiles: string[], opts: GateOpti
   ];
   return formatReport(findings, { ungatedCount: index.ungated.length });
 }
-

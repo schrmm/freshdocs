@@ -1,7 +1,6 @@
 import { readdirSync } from "node:fs";
 import { join, sep } from "node:path";
-
-export const IGNORED_DIRS = new Set(["node_modules", "dist", ".git", ".agents"]);
+import { IGNORED_DIRS } from "./repo-policy.ts";
 
 /** Every file in the repo, as repo-relative POSIX paths. Skips ignored dirs. */
 export function listFiles(repoRoot: string): Set<string> {
