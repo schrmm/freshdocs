@@ -186,6 +186,8 @@ Plus pure finding-producers (`link-checker`, `coverage`) and pure helpers (`bump
 
 Shared repo-shape defaults live in `repo-policy`: ignored directories (`node_modules`, `dist`, `.git`, `.agents`) and the conventional code-surface prefixes (`src/`, `lib/`, `app/`, `packages/`). There is no required config file in v1; those defaults are deliberately boring and hardcoded.
 
+Publishable skill packages live under `skills/freshdocs-*`, following the Matt Pocock-style source layout. Installed skills land under the target harness's active skill directory such as `.agents/skills` or `~/.agents/skills`; the source repo does not track publishable skills under its own `.agents/skills`, so Codex does not double-load them while developing freshdocs.
+
 See `docs/specs/2026-05-22-freshdocs-design.md` for the full design rationale, and the issue tracker for the seven implementation slices that built it.
 
 ## License

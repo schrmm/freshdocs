@@ -46,6 +46,7 @@ Claude Code can continue to use command adapters such as `/freshdocs:doc-audit`,
 - Replace the single public `freshdocs` skill surface with three public action skills: `freshdocs-doc-audit`, `freshdocs-update-docs`, and `freshdocs-create-docs`.
 - Keep the deterministic CLIs (`doc-gate`, `freshdocs-audit`) and existing TypeScript modules unchanged unless packaging or resolution requires a narrow adjustment.
 - Treat each action skill as a small `SKILL.md` package with its own `name`, `description`, body instructions, and optional `agents/openai.yaml` metadata.
+- Store publishable skill packages under top-level `skills/`, not repo-local `.agents/skills/`, so the source checkout does not also activate the packaged skills and create duplicate Codex entries.
 - Keep each action skill self-contained, following the Matt Pocock skills pattern. Repeat short shared principles where that improves local clarity. Add per-skill reference files only when a specific skill needs long exact formats or rules; do not create cross-skill shared references as an abstraction by default.
 - Keep Claude command templates as adapters. Each command template should point at the corresponding action skill and preserve the existing `/freshdocs:*` naming for Claude Code.
 - Remove or avoid Codex plugin packaging for now. The install target is Agent Skills via `skills.sh`, not Codex plugin distribution.

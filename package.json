@@ -13,6 +13,7 @@
     ".agents",
     "AGENTS.md",
     "dist",
+    "skills",
     "commands",
     "hooks",
     "README.md"

@@ -5,11 +5,4 @@ node_modules/
 !.agents/commands/
 !.agents/commands/freshdocs/
 !.agents/commands/freshdocs/*.md
-!.agents/skills/
-!.agents/skills/freshdocs-doc-audit/
-!.agents/skills/freshdocs-doc-audit/**
-!.agents/skills/freshdocs-update-docs/
-!.agents/skills/freshdocs-update-docs/**
-!.agents/skills/freshdocs-create-docs/
-!.agents/skills/freshdocs-create-docs/**
 skills-lock.json

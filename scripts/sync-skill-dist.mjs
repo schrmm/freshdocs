@@ -8,7 +8,7 @@ const skillNames = [
 ];
 
 for (const skillName of skillNames) {
-  const target = join(".agents", "skills", skillName, "dist");
+  const target = join("skills", skillName, "dist");
   rmSync(target, { recursive: true, force: true });
   mkdirSync(target, { recursive: true });
 
