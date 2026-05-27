@@ -1,8 +1,8 @@
 ---
 audience: human
 covers: ["src/**"]
-synced: b99a2f4d417555178bb8c1f0652d052e4dcc46dc
-reviewed: 2026-05-26
+synced: 6308e29167a281d84dd895ed7ad7a0441ee7802b
+reviewed: 2026-05-27
 review_interval: 60d
 ---
 
@@ -176,13 +176,15 @@ The skills themselves are the judgment layer. They are automatically loaded by h
 
 ## Architecture
 
-Four deep modules behind a thin CLI:
+Core modules behind thin CLIs:
 - `docmeta-index` — frontmatter parser + repo walker → `DocIndex`
 - `structural-fingerprint` — `(topLevel, scripts, bin)` hash + diff
 - `detect-engine` — pure drift/severity/path-filter
-- `url-health` — external URL HEAD→GET classifier with an injectable fetcher
+- `link-checker` — internal Markdown link validation + external URL extraction
+- `url-health` — injected external URL status classifier used by audit
+- `coverage` — explicit / wildcard-only / uncovered source coverage classification
 
-Plus pure finding-producers (`link-checker`, `coverage`) and pure helpers (`bump-frontmatter`, `write-frontmatter`, `init-docmeta`). 70 behavior-only tests.
+Plus pure helpers (`bump-frontmatter`, `write-frontmatter`, `init-docmeta`). 85 behavior-only tests.
 
 Shared repo-shape defaults live in `repo-policy`: ignored directories (`node_modules`, `dist`, `.git`, `.agents`) and the conventional code-surface prefixes (`src/`, `lib/`, `app/`, `packages/`). There is no required config file in v1; those defaults are deliberately boring and hardcoded.
 
