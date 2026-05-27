@@ -12,20 +12,24 @@ Two one-time CLI bins that wire freshdocs into the user's environment. Both are 
 
 ## `freshdocs-install-commands` (`src/install-commands-cli.ts`)
 
-Copies the slash command markdown files into `~/.claude/commands/freshdocs/`.
+Copies the command markdown files into `~/.agents/commands/freshdocs/` by default. With `--claude`, copies the same templates into `~/.claude/commands/freshdocs/` as Claude Code slash-command adapters.
 
 ```sh
 freshdocs-install-commands
-# → freshdocs: installed 3 slash command(s) into <home>/.claude/commands/freshdocs
-#   available as /freshdocs:<name> after reloading your agent host
+# → freshdocs: installed 3 command template(s) into <home>/.agents/commands/freshdocs
+#   use freshdocs through the installed skill where your agent supports skills
+
+freshdocs-install-commands --claude
+# → freshdocs: installed 3 command template(s) into <home>/.claude/commands/freshdocs
+#   Claude Code exposes these as /freshdocs:<name> after reloading
 ```
 
 - Source: `<pkgRoot>/commands/*.md` (every `.md` file in the package's `commands/` dir).
-- Target: `${homedir()}/.claude/commands/freshdocs/` — created with `recursive: true`.
+- Target: `${homedir()}/.agents/commands/freshdocs/`, or `${homedir()}/.claude/commands/freshdocs/` with `--claude` — created with `recursive: true`.
 - Copies are unconditional (overwrite-on-each-run). Re-running picks up newer command definitions; this is the resync path.
 - Output reports the integer count and the absolute target path.
 
-Slash commands appear as `/freshdocs:<basename-without-md>` after the agent host reloads.
+Claude slash commands appear as `/freshdocs:<basename-without-md>` after Claude Code reloads. Codex uses the installed skills, not these templates, as its action surface.
 
 ## `freshdocs-install-hook` (`src/install-hook-cli.ts`)
 
@@ -44,7 +48,7 @@ Resolution & safety:
    - "Is a freshdocs hook" = the file contains the literal string `freshdocs documentation gate (pre-commit)` (constant `FRESHDOCS_HOOK_MARKER`). The marker lives in `hooks/pre-commit`'s comment header — do not rename it without updating both files.
 5. `chmodSync(target, 0o755)` — wrapped in try/catch because Windows throws on chmod (no-op there; `cmd`/`bash` shims use `.cmd` extension anyway).
 
-The hook itself, once installed, resolves `doc-gate` at runtime in five tiers (PATH → `node_modules/.bin/` → project `.agents/skills/freshdocs/dist/cli-main.cjs` → global `~/.codex/skills/freshdocs/dist/cli-main.cjs` → global `~/.agents/skills/freshdocs/dist/cli-main.cjs`). That logic is in `hooks/pre-commit`, not in this bin. The hook also honors `FRESHDOCS_NO_BEHAVIOR_CHANGE=1`, which downgrades drift findings to warnings for explicitly non-behavioral commits while leaving broken-link failures intact.
+The hook itself, once installed, resolves `doc-gate` at runtime in six tiers (PATH → `node_modules/.bin/` → project `.agents/skills/freshdocs-update-docs/dist/cli-main.cjs` → global `~/.codex/skills/freshdocs-update-docs/dist/cli-main.cjs` → global `~/.agents/skills/freshdocs-update-docs/dist/cli-main.cjs` → legacy `freshdocs` skill dist in project, Codex global, or portable global locations). That logic is in `hooks/pre-commit`, not in this bin. The hook also honors `FRESHDOCS_NO_BEHAVIOR_CHANGE=1`, which downgrades drift findings to warnings for explicitly non-behavioral commits while leaving broken-link failures intact.
 
 ## Gotchas
 

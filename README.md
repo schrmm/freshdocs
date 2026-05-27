@@ -14,7 +14,7 @@ Keep project documentation reflecting the current state of the codebase.
 
 freshdocs is a portable [Agent Skills](https://www.skills.sh) package that systematically finds the discrepancies that make docs lie — docs-vs-code drift, broken links, fragmented duplication, coverage gaps, macro-doc staleness — and drives them to resolution.
 
-**Detect cheap, repair smart.** A deterministic gate (`doc-gate`, no LLM) fails loud at commit/PR; a read-only audit (`freshdocs-audit`) snapshots the whole repo; an LLM-assisted skill repairs flagged docs on demand via `/freshdocs:update-docs`. One skill + two bundled scripts; works in Claude Code, Pi, Cursor, and any host that reads the Agent Skills standard.
+**Detect cheap, repair smart.** A deterministic gate (`doc-gate`, no LLM) fails loud at commit/PR; a read-only audit (`freshdocs-audit`) snapshots the whole repo; three focused agent skills audit, repair, and author missing docs. One `skills.sh` install vendors the skills and bundled CLIs for Claude Code, Codex, Pi, Cursor, and any host that reads the Agent Skills standard.
 
 ## Install
 
@@ -22,9 +22,13 @@ freshdocs is a portable [Agent Skills](https://www.skills.sh) package that syste
 npx skills add schrmm/freshdocs
 ```
 
-That is the whole install path. `skills.sh` will ask which agent harness and scope to use; choose Codex when installing for Codex. The installed skill includes the pre-built `dist/` CLIs, so no global npm install is required.
+That is the whole install path. `skills.sh` will ask which agent harness and scope to use; choose Codex when installing for Codex. The package installs three coordinated skills, each with the pre-built `dist/` CLIs included, so no global npm install is required:
 
-In Codex, freshdocs appears as a skill, not as a slash command. Start a new Codex session if it was installed while Codex was already running, then use `/skills` or type `$freshdocs` to invoke it.
+- `freshdocs-doc-audit`
+- `freshdocs-update-docs`
+- `freshdocs-create-docs`
+
+In Codex, freshdocs appears as selectable skills, not as slash commands. Start a new Codex session if it was installed while Codex was already running, then use `/skills` or invoke `$freshdocs-doc-audit`, `$freshdocs-update-docs`, or `$freshdocs-create-docs`.
 
 Optional: install as an npm package only if you want `doc-gate` and `freshdocs-audit` directly on PATH everywhere:
 
@@ -49,9 +53,9 @@ freshdocs-install-commands --claude
 
 `freshdocs-install-hook` refuses to clobber a non-freshdocs `pre-commit` hook; pass `--force` to override. `freshdocs-install-commands` installs the agent-neutral command templates by default; pass `--claude` only when you want the Claude Code slash-command adapter. Both bins resolve their source files (`hooks/pre-commit`, `commands/*.md`) from wherever freshdocs is installed — works for both `npx skills add` and `npm i -g github:` layouts.
 
-Codex does not load arbitrary third-party slash commands from those templates. The `/freshdocs:doc-audit`, `/freshdocs:update-docs`, and `/freshdocs:create-docs` templates are for hosts that support Markdown command templates, such as Claude Code. In Codex, use `/skills` or mention `$freshdocs`; restart Codex or start a new session if the skill was installed while Codex was already running.
+Codex does not load arbitrary third-party slash commands from those templates. The `/freshdocs:doc-audit`, `/freshdocs:update-docs`, and `/freshdocs:create-docs` templates are adapters for hosts that support Markdown command templates, such as Claude Code. In Codex, use `/skills` or mention the corresponding skill by name; restart Codex or start a new session if the skills were installed while Codex was already running.
 
-The hook itself resolves `doc-gate` at runtime in this order: PATH → `node_modules/.bin/` → project `.agents/skills/freshdocs/dist/cli-main.cjs` → global `~/.codex/skills/freshdocs/dist/cli-main.cjs` → global `~/.agents/skills/freshdocs/dist/cli-main.cjs` via `node`. The first one that exists wins.
+The hook itself resolves `doc-gate` at runtime in this order: PATH → `node_modules/.bin/` → project `.agents/skills/freshdocs-update-docs/dist/cli-main.cjs` → global `~/.codex/skills/freshdocs-update-docs/dist/cli-main.cjs` → global `~/.agents/skills/freshdocs-update-docs/dist/cli-main.cjs` → legacy `freshdocs` skill dist in project, Codex global, or portable global locations via `node`. The first one that exists wins.
 
 ## What it detects
 
@@ -76,9 +80,9 @@ Agent-facing docs (`docs/agents/**`, `CLAUDE.md`, `AGENTS.md`, `CONTEXT.md`) **f
 2. freshdocs-install-commands             # one-time, global command templates
 3. freshdocs-install-hook                 # per-repo, wire pre-commit
 4. freshdocs-audit --init --apply         # bootstrap empty docmeta blocks
-5. /freshdocs:doc-audit                   # see the honest gap
-6. /freshdocs:create-docs                 # sweep: cluster → approve → draft → review
-7. /freshdocs:update-docs                 # repair any pre-existing drift
+5. $freshdocs-doc-audit                   # see the honest gap
+6. $freshdocs-create-docs                 # sweep: cluster → approve → draft → review
+7. $freshdocs-update-docs                 # repair any pre-existing drift
 8. git add . && git commit                # gate should pass
 ```
 
@@ -88,8 +92,8 @@ Agent-facing docs (`docs/agents/**`, `CLAUDE.md`, `AGENTS.md`, `CONTEXT.md`) **f
 1. Edit code → git add → git commit
 2. Pre-commit hook runs doc-gate:
    ├─ Clean                   → commit lands
-   ├─ Drift / broken-link     → BLOCKS  → /freshdocs:update-docs → re-commit
-   ├─ Uncovered (new file)    → WARN    → commit lands; /freshdocs:create-docs <path> when ready
+   ├─ Drift / broken-link     → BLOCKS  → $freshdocs-update-docs → re-commit
+   ├─ Uncovered (new file)    → WARN    → commit lands; $freshdocs-create-docs <path> when ready
    └─ Macro-stale             → WARN    → commit lands; review when convenient
 ```
 
@@ -98,24 +102,24 @@ For explicitly non-behavioral code changes, set `FRESHDOCS_NO_BEHAVIOR_CHANGE=1`
 ### C. Periodic health-check (safety net)
 
 ```
-1. /freshdocs:doc-audit
+1. $freshdocs-doc-audit
 2. Read sections:
    - Explicit coverage % — gap visible
-   - Overdue reviews     → /freshdocs:update-docs
-   - Uncovered (state)   → /freshdocs:create-docs
-   - Broken external     → /freshdocs:update-docs
-   - Macro-stale         → /freshdocs:update-docs
+   - Overdue reviews     → $freshdocs-update-docs
+   - Uncovered (state)   → $freshdocs-create-docs
+   - Broken external     → $freshdocs-update-docs
+   - Macro-stale         → $freshdocs-update-docs
 ```
 
 ### Decision table — "when to use which"
 
-| Situation | First command |
+| Situation | First skill or command |
 |---|---|
-| Fresh repo / starting adoption | `/freshdocs:doc-audit` → `/freshdocs:create-docs` (sweep) |
-| Commit blocked by gate | `/freshdocs:update-docs` |
-| Commit warned: new uncovered file | `/freshdocs:create-docs <path>` |
-| Want to document a specific module now | `/freshdocs:create-docs <path>` |
-| Quarterly review / pre-release | `/freshdocs:doc-audit` → dispatch |
+| Fresh repo / starting adoption | `freshdocs-doc-audit` → `freshdocs-create-docs` (sweep) |
+| Commit blocked by gate | `freshdocs-update-docs` |
+| Commit warned: new uncovered file | `freshdocs-create-docs <path>` |
+| Want to document a specific module now | `freshdocs-create-docs <path>` |
+| Quarterly review / pre-release | `freshdocs-doc-audit` → dispatch |
 | Doc contradicts accepted ADR | hand off to `grill-with-docs` (superseding ADR) |
 | New CONTEXT.md / domain language needed | hand off to `grill-with-docs` |
 
@@ -142,18 +146,18 @@ freshdocs-audit --init --apply   # write conservative docmeta to un-annotated do
 
 ## Slash commands
 
-`commands/` ships three templates for Claude Code (and any host with `.md` command templates). They are also mirrored under `.agents/commands/freshdocs` for agent-neutral consumers:
+`commands/` ships three adapter templates for Claude Code (and any host with `.md` command templates). They are also mirrored under `.agents/commands/freshdocs` for agent-neutral consumers:
 
-- **`/freshdocs:doc-audit`** — read-only whole-repo health report.
-- **`/freshdocs:update-docs`** — invokes the `freshdocs` skill to reconcile flagged docs.
-- **`/freshdocs:create-docs`** — drafts missing docs from audit coverage gaps.
+- **`/freshdocs:doc-audit`** — invokes `freshdocs-doc-audit`.
+- **`/freshdocs:update-docs`** — invokes `freshdocs-update-docs`.
+- **`/freshdocs:create-docs`** — invokes `freshdocs-create-docs`.
 
-The skill itself (`SKILL.md`) is the judgment layer. It is automatically loaded by hosts that follow the Agent Skills standard when matching the description.
+The skills themselves are the judgment layer. They are automatically loaded by hosts that follow the Agent Skills standard when matching their descriptions.
 
 ## What freshdocs replaces — and what it doesn't
 
 **Replaces (retire these):**
-- `doc-sync` — its DRY methodology is the core of the `freshdocs` skill.
+- `doc-sync` — its DRY methodology is the core of the freshdocs skill family.
 - `update-docs` (command) — becomes `/freshdocs:update-docs`.
 - `claude-md-improver` — CLAUDE.md / AGENTS.md / CONTEXT.md are now gated agent-context docs.
 - `revise-claude-md` — session-learning capture folds into `/freshdocs:update-docs` (light context-file updates inline).

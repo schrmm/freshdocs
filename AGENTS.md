@@ -32,11 +32,25 @@ Add or update Node test-runner tests in `test/` when behavior changes. Keep test
 
 Canonical portable agent assets belong in this repository, not in a vendor-only folder:
 
-- `SKILL.md` is the installable Agent Skill entrypoint for `skills.sh`.
+- `.agents/skills/freshdocs-doc-audit`, `.agents/skills/freshdocs-update-docs`, and `.agents/skills/freshdocs-create-docs` are the installable Agent Skill entrypoints for `skills.sh`.
 - `commands/` contains reusable command prompt templates.
 - `freshdocs-install-commands` installs command templates to `~/.agents/commands/freshdocs` by default. Use `--claude` only for the Claude Code slash-command adapter.
 
 Vendor-specific folders are adapters only. Keep durable instructions here and in the skill.
+
+## Agent skills
+
+### Issue tracker
+
+Issues and PRDs are tracked in GitHub Issues for `schrmm/freshdocs`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Use the default Matt Pocock triage label vocabulary. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context repo: read root `CONTEXT.md` when present and `docs/adr/` for decisions. See `docs/agents/domain.md`.
 
 ## PR Or Commit Guidance
 

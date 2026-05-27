@@ -1,0 +1,4 @@
+interface:
+  display_name: "freshdocs doc-audit"
+  short_description: "Run a read-only documentation health audit."
+  default_prompt: "Run freshdocs doc-audit for this repo."

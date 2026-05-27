@@ -7,13 +7,13 @@ reviewed: 2026-05-26
 review_interval: 30d
 ---
 
-You are repairing documentation discrepancies for this repo.
+Use the `freshdocs-update-docs` skill to repair documentation discrepancies for this repo.
 
-1. Activate the `freshdocs` skill (read its SKILL.md) before doing anything else.
+1. Activate the `freshdocs-update-docs` skill (read its SKILL.md) before doing anything else.
 2. Gather the current findings:
    - Run `doc-gate` against the staged change set (or the diff being prepared). Capture its `Finding[]`.
    - If the user invoked this command outside a commit context, run `freshdocs-audit` instead and use its report.
-   - Bin resolution for both: try `doc-gate` / `freshdocs-audit` on PATH first; fall back to `node_modules/.bin/...`; then project `.agents/skills/freshdocs/dist`; then global `~/.codex/skills/freshdocs/dist`; final fallback global `~/.agents/skills/freshdocs/dist`.
+   - Bin resolution for both: try `doc-gate` / `freshdocs-audit` on PATH first; fall back to `node_modules/.bin/...`; then project `.agents/skills/freshdocs-update-docs/dist`; then global `~/.codex/skills/freshdocs-update-docs/dist`; then global `~/.agents/skills/freshdocs-update-docs/dist`; final fallback legacy `.agents/skills/freshdocs/dist`, `~/.codex/skills/freshdocs/dist`, or `~/.agents/skills/freshdocs/dist`.
    - Repo shape and code-surface defaults come from freshdocs' shared repo policy; only reconcile findings the tool reports.
    - If the user explicitly marks the change non-behavioral, `FRESHDOCS_NO_BEHAVIOR_CHANGE=1` downgrades drift findings to warnings in the pre-commit hook. Manual gate runs can use `doc-gate --no-behavior-change`. Broken links still fail.
 3. Walk every finding in the order defined by the skill (drift → broken links → macro staleness → overdue reviews → external links).

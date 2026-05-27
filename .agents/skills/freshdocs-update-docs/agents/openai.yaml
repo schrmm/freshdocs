@@ -1,0 +1,4 @@
+interface:
+  display_name: "freshdocs update-docs"
+  short_description: "Repair documentation drift and broken links."
+  default_prompt: "Repair the freshdocs findings for this repo."

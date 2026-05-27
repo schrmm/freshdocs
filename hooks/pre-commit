@@ -3,9 +3,11 @@
 # Resolves doc-gate in this priority:
 #   1. doc-gate on PATH               (global npm install)
 #   2. node_modules/.bin/doc-gate     (local npm install)
-#   3. .agents/skills/freshdocs/dist/ (project skill install)
-#   4. ~/.codex/skills/freshdocs/dist/ (Codex global skill install)
-#   5. ~/.agents/skills/freshdocs/dist/ (portable global skill install)
+#   3. .agents/skills/freshdocs-update-docs/dist/ (project skill install)
+#   4. ~/.codex/skills/freshdocs-update-docs/dist/ (Codex global skill install)
+#   5. ~/.agents/skills/freshdocs-update-docs/dist/ (portable global skill install)
+#   6. .agents/skills/freshdocs/dist/, ~/.codex/skills/freshdocs/dist/,
+#      or ~/.agents/skills/freshdocs/dist/ (legacy)
 # Blocks the commit when staged code drifts from an agent-facing doc.
 # Set FRESHDOCS_NO_BEHAVIOR_CHANGE=1 to downgrade drift to warnings for
 # explicitly non-behavioral commits; broken links still block.
@@ -14,6 +16,12 @@ if command -v doc-gate >/dev/null 2>&1; then
   exec doc-gate
 elif [ -x "node_modules/.bin/doc-gate" ]; then
   exec node_modules/.bin/doc-gate
+elif [ -f ".agents/skills/freshdocs-update-docs/dist/cli-main.cjs" ]; then
+  exec node .agents/skills/freshdocs-update-docs/dist/cli-main.cjs
+elif [ -f "$HOME/.codex/skills/freshdocs-update-docs/dist/cli-main.cjs" ]; then
+  exec node "$HOME/.codex/skills/freshdocs-update-docs/dist/cli-main.cjs"
+elif [ -f "$HOME/.agents/skills/freshdocs-update-docs/dist/cli-main.cjs" ]; then
+  exec node "$HOME/.agents/skills/freshdocs-update-docs/dist/cli-main.cjs"
 elif [ -f ".agents/skills/freshdocs/dist/cli-main.cjs" ]; then
   exec node .agents/skills/freshdocs/dist/cli-main.cjs
 elif [ -f "$HOME/.codex/skills/freshdocs/dist/cli-main.cjs" ]; then
@@ -21,6 +29,6 @@ elif [ -f "$HOME/.codex/skills/freshdocs/dist/cli-main.cjs" ]; then
 elif [ -f "$HOME/.agents/skills/freshdocs/dist/cli-main.cjs" ]; then
   exec node "$HOME/.agents/skills/freshdocs/dist/cli-main.cjs"
 else
-  echo "freshdocs: doc-gate not found (PATH, node_modules/.bin, .agents/skills/freshdocs/dist, ~/.codex/skills/freshdocs/dist, or ~/.agents/skills/freshdocs/dist); skipping gate" >&2
+  echo "freshdocs: doc-gate not found (PATH, node_modules/.bin, freshdocs-update-docs skill dist, or legacy freshdocs skill dist); skipping gate" >&2
   exit 0
 fi

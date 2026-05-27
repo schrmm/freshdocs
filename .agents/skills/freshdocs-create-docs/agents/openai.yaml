@@ -1,0 +1,4 @@
+interface:
+  display_name: "freshdocs create-docs"
+  short_description: "Author missing docs for uncovered source areas."
+  default_prompt: "Create freshdocs coverage docs for this repo."
