@@ -7,6 +7,8 @@ const skillNames = [
   "freshdocs-create-docs",
 ];
 
+const skillRuntimeEntries = new Set(["audit-cli.cjs", "cli-main.cjs"]);
+
 for (const skillName of skillNames) {
   const target = join("skills", skillName, "dist");
   rmSync(target, { recursive: true, force: true });
@@ -14,6 +16,7 @@ for (const skillName of skillNames) {
 
   for (const entry of readdirSync("dist", { withFileTypes: true })) {
     if (!entry.isFile()) continue;
+    if (!skillRuntimeEntries.has(entry.name)) continue;
     copyFileSync(join("dist", entry.name), join(target, entry.name));
   }
 }

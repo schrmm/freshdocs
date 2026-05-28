@@ -22,11 +22,8 @@ Author missing documentation for source areas that are uncovered or only wildcar
    - `freshdocs-audit` on PATH.
    - `node_modules/.bin/freshdocs-audit`.
    - Project `.agents/skills/freshdocs-create-docs/dist/audit-cli.cjs`.
-   - Project legacy `.agents/skills/freshdocs/dist/audit-cli.cjs`.
    - Global `~/.codex/skills/freshdocs-create-docs/dist/audit-cli.cjs`.
-   - Global legacy `~/.codex/skills/freshdocs/dist/audit-cli.cjs`.
    - Global `~/.agents/skills/freshdocs-create-docs/dist/audit-cli.cjs`.
-   - Global legacy `~/.agents/skills/freshdocs/dist/audit-cli.cjs`.
 4. Sweep mode: read every uncovered and wildcard-only source file, then propose semantic clusters. Do not draft one doc per file unless each file is genuinely independent.
 5. Present the cluster proposal as: doc path -> files covered. Ask the user to approve or edit before drafting.
 6. Draft each approved group:

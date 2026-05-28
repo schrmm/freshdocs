@@ -103,3 +103,43 @@ test("runAudit: uncovered field mirrors coverage.uncoveredFiles", async () => {
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test("runAudit treats scripts/ as first-run source surface", async () => {
+  const root = fixture({
+    "scripts/migrate_agent_assets.py": "print('migrate')\n",
+    "README.md": "---\ncovers: []\n---\n# tool\n",
+  });
+  try {
+    const report = await runAudit(root, {
+      fetch: async () => null,
+    });
+    assert.equal(report.coverage.total, 1);
+    assert.equal(report.coverage.uncovered, 1);
+    assert.deepEqual(report.coverage.uncoveredFiles, ["scripts/migrate_agent_assets.py"]);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("runAudit ignores Python bytecode and cache directories", async () => {
+  const root = fixture({
+    "scripts/migrate_agent_assets.py": "print('migrate')\n",
+    "scripts/__pycache__/migrate_agent_assets.cpython-312.pyc": "bytecode",
+    "scripts/tool.pyc": "bytecode",
+    ".pytest_cache/state": "cache",
+    ".mypy_cache/cache.json": "{}",
+    ".ruff_cache/cache": "cache",
+    ".venv/lib/python/site-packages/pkg.py": "print('pkg')\n",
+    "venv/lib/python/site-packages/pkg.py": "print('pkg')\n",
+    "README.md": "---\ncovers: []\n---\n# tool\n",
+  });
+  try {
+    const report = await runAudit(root, {
+      fetch: async () => null,
+    });
+    assert.equal(report.coverage.total, 1);
+    assert.deepEqual(report.coverage.uncoveredFiles, ["scripts/migrate_agent_assets.py"]);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});

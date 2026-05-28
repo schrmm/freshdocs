@@ -25,11 +25,8 @@ Resolve bins in this order:
 1. `doc-gate` / `freshdocs-audit` on PATH.
 2. `node_modules/.bin/...`.
 3. Project `.agents/skills/freshdocs-update-docs/dist`.
-4. Project legacy `.agents/skills/freshdocs/dist`.
-5. Global `~/.codex/skills/freshdocs-update-docs/dist`.
-6. Global legacy `~/.codex/skills/freshdocs/dist`.
-7. Global `~/.agents/skills/freshdocs-update-docs/dist`.
-8. Global legacy `~/.agents/skills/freshdocs/dist`.
+4. Global `~/.codex/skills/freshdocs-update-docs/dist`.
+5. Global `~/.agents/skills/freshdocs-update-docs/dist`.
 
 ## Repair Loop
 

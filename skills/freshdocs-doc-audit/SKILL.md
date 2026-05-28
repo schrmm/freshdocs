@@ -17,13 +17,10 @@ Run the read-only freshdocs audit. This skill is the audit action in the freshdo
    - `freshdocs-audit` on PATH.
    - `node_modules/.bin/freshdocs-audit`.
    - `node .agents/skills/freshdocs-doc-audit/dist/audit-cli.cjs` when installed into the project.
-   - `node .agents/skills/freshdocs/dist/audit-cli.cjs` for older installs.
    - `node ~/.codex/skills/freshdocs-doc-audit/dist/audit-cli.cjs`.
-   - `node ~/.codex/skills/freshdocs/dist/audit-cli.cjs` for older Codex installs.
    - `node ~/.agents/skills/freshdocs-doc-audit/dist/audit-cli.cjs`.
-   - `node ~/.agents/skills/freshdocs/dist/audit-cli.cjs` for older installs.
 2. Present the report grouped by section:
-   - Coverage: explicit coverage percentage plus top undocumented files.
+   - Coverage: explicit coverage percentage plus wildcard-only and uncovered files.
    - Overdue reviews.
    - Broken internal links.
    - External links.

@@ -1,6 +1,6 @@
 # PRD: freshdocs v1
 
-> Source: synthesized from design spec `docs/specs/2026-05-22-freshdocs-design.md`. Published to the issue tracker with label `ready-for-agent`.
+> Source: synthesized from the original freshdocs design discussion. Published to the issue tracker with label `ready-for-agent`.
 
 ## Problem Statement
 

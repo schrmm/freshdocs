@@ -83,10 +83,20 @@ test("detectUncovered: does NOT flag when an explicit cover lists the file", () 
 
 test("detectUncovered: ignores files outside code prefixes", () => {
   const findings = detectUncovered({
-    newlyAddedFiles: ["scripts/release.sh", "config/foo.yml"],
+    newlyAddedFiles: ["config/foo.yml"],
     index: index({ path: "docs/agents/api.md", audience: "agent", covers: [] }),
   });
   assert.deepEqual(findings, []);
+});
+
+test("detectUncovered: flags newly-added scripts by default", () => {
+  const findings = detectUncovered({
+    newlyAddedFiles: ["scripts/migrate_agent_assets.py"],
+    index: index({ path: "docs/agents/api.md", audience: "agent", covers: [] }),
+  });
+  assert.equal(findings.length, 1);
+  assert.equal(findings[0]!.doc, "scripts/migrate_agent_assets.py");
+  assert.equal(findings[0]!.kind, "uncovered");
 });
 
 test("detectUncovered: ignores markdown files (docs themselves)", () => {

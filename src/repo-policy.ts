@@ -1,5 +1,31 @@
-export const IGNORED_DIRS = new Set(["node_modules", "dist", ".git", ".agents"]);
+export const IGNORED_DIRS = new Set([
+  "node_modules",
+  "dist",
+  "build",
+  "coverage",
+  ".git",
+  ".agents",
+  ".venv",
+  "venv",
+  "__pycache__",
+  ".pytest_cache",
+  ".mypy_cache",
+  ".ruff_cache",
+  ".tox",
+]);
+
+export const IGNORED_FILE_SUFFIXES = [
+  ".pyc",
+  ".pyo",
+  ".pyd",
+] as const;
+
+export function isIgnoredFile(name: string): boolean {
+  return IGNORED_FILE_SUFFIXES.some((suffix) => name.endsWith(suffix));
+}
 
 // Conventional "code surface" prefixes. Configs/lockfiles/etc. are deliberately
-// excluded so coverage and uncovered-file checks stay meaningful.
-export const DEFAULT_CODE_PREFIXES = ["src/", "lib/", "app/", "packages/"] as const;
+// excluded so coverage and uncovered-file checks stay meaningful. `scripts/`
+// is included because small skill/tooling repos often put their primary
+// implementation there instead of under `src/`.
+export const DEFAULT_CODE_PREFIXES = ["src/", "lib/", "app/", "packages/", "scripts/"] as const;

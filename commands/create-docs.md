@@ -2,8 +2,8 @@
 description: Author missing per-module / workflow / orientation docs. Sweep mode walks all uncovered findings; targeted mode authors a specific unit. Hands off to grill-with-docs for domain-language territory.
 audience: agent
 covers: ["src/audit-cli.ts", "src/audit.ts", "src/coverage.ts", "src/detect-engine.ts"]
-synced: eb07b47d0dee16b0a0b4e7406c2566cd61439ddc
-reviewed: 2026-05-26
+synced: a38d607c1ddd506aada1c1bb4b340a3b1018eead
+reviewed: 2026-05-27
 review_interval: 30d
 ---
 
@@ -17,8 +17,8 @@ Use the `freshdocs-create-docs` skill to author missing documentation for this r
    - **Argument is a doc path** → scaffold at that path. For `docs/workflows/<name>.md` and `docs/overview.md`, scaffold a structured outline and ask the user to fill the prose.
 
 3. **Audit first.** Run `freshdocs-audit` and capture `uncovered` + `wildcardOnly` lists, plus full file paths.
-   - Bin resolution: try `freshdocs-audit` on PATH; fall back to `node_modules/.bin/freshdocs-audit`; then project `.agents/skills/freshdocs-create-docs/dist/audit-cli.cjs`; then global `~/.codex/skills/freshdocs-create-docs/dist/audit-cli.cjs`; then global `~/.agents/skills/freshdocs-create-docs/dist/audit-cli.cjs`; final fallback legacy `.agents/skills/freshdocs/dist/audit-cli.cjs`, `~/.codex/skills/freshdocs/dist/audit-cli.cjs`, or `~/.agents/skills/freshdocs/dist/audit-cli.cjs`.
-   - The default code surface comes from freshdocs' shared repo policy (`src/`, `lib/`, `app/`, `packages/`); targeted mode can still operate on an explicit source path outside that set.
+   - Bin resolution: try `freshdocs-audit` on PATH; fall back to `node_modules/.bin/freshdocs-audit`; then project `.agents/skills/freshdocs-create-docs/dist/audit-cli.cjs`; then global `~/.codex/skills/freshdocs-create-docs/dist/audit-cli.cjs`; then global `~/.agents/skills/freshdocs-create-docs/dist/audit-cli.cjs`.
+   - The default code surface comes from freshdocs' shared repo policy (`src/`, `lib/`, `app/`, `packages/`, `scripts/`); targeted mode can still operate on an explicit source path outside that set.
 
 4. **Sweep mode: cluster and propose.**
    - Read every source file in the uncovered + wildcard-only sets.

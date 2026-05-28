@@ -32,7 +32,8 @@ Add or update Node test-runner tests in `test/` when behavior changes. Keep test
 
 Canonical portable agent assets belong in this repository, not in a vendor-only folder:
 
-- `.agents/skills/freshdocs-doc-audit`, `.agents/skills/freshdocs-update-docs`, and `.agents/skills/freshdocs-create-docs` are the installable Agent Skill entrypoints for `skills.sh`.
+- `skills/freshdocs-doc-audit`, `skills/freshdocs-update-docs`, and `skills/freshdocs-create-docs` are the publishable Agent Skill entrypoints discovered by `skills.sh`.
+- `.agents/skills/...`, `~/.agents/skills/...`, and harness-specific skill directories are install targets only; do not track the public source skills there or the checkout may double-load them while developing freshdocs.
 - `commands/` contains reusable command prompt templates.
 - `freshdocs-install-commands` installs command templates to `~/.agents/commands/freshdocs` by default. Use `--claude` only for the Claude Code slash-command adapter.
 

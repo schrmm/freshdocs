@@ -1,8 +1,8 @@
 ---
 audience: agent
-covers: ["src/install-commands-cli.ts", "src/install-hook-cli.ts"]
-synced: eb07b47d0dee16b0a0b4e7406c2566cd61439ddc
-reviewed: 2026-05-26
+covers: ["src/install-commands-cli.ts", "src/install-hook-cli.ts", "scripts/sync-skill-dist.mjs"]
+synced: a38d607c1ddd506aada1c1bb4b340a3b1018eead
+reviewed: 2026-05-27
 review_interval: 30d
 ---
 
@@ -48,7 +48,17 @@ Resolution & safety:
    - "Is a freshdocs hook" = the file contains the literal string `freshdocs documentation gate (pre-commit)` (constant `FRESHDOCS_HOOK_MARKER`). The marker lives in `hooks/pre-commit`'s comment header — do not rename it without updating both files.
 5. `chmodSync(target, 0o755)` — wrapped in try/catch because Windows throws on chmod (no-op there; `cmd`/`bash` shims use `.cmd` extension anyway).
 
-The hook itself, once installed, resolves `doc-gate` at runtime in six tiers (PATH → `node_modules/.bin/` → project `.agents/skills/freshdocs-update-docs/dist/cli-main.cjs` → global `~/.codex/skills/freshdocs-update-docs/dist/cli-main.cjs` → global `~/.agents/skills/freshdocs-update-docs/dist/cli-main.cjs` → legacy `freshdocs` skill dist in project, Codex global, or portable global locations). That logic is in `hooks/pre-commit`, not in this bin. The hook also honors `FRESHDOCS_NO_BEHAVIOR_CHANGE=1`, which downgrades drift findings to warnings for explicitly non-behavioral commits while leaving broken-link failures intact.
+The hook itself, once installed, resolves `doc-gate` at runtime in five tiers (PATH → `node_modules/.bin/` → project `.agents/skills/freshdocs-update-docs/dist/cli-main.cjs` → global `~/.codex/skills/freshdocs-update-docs/dist/cli-main.cjs` → global `~/.agents/skills/freshdocs-update-docs/dist/cli-main.cjs`). That logic is in `hooks/pre-commit`, not in this bin. The hook also honors `FRESHDOCS_NO_BEHAVIOR_CHANGE=1`, which downgrades drift findings to warnings for explicitly non-behavioral commits while leaving broken-link failures intact.
+
+## Skill dist sync (`scripts/sync-skill-dist.mjs`)
+
+The package build writes bundled CLIs to root `dist/`, then runs `scripts/sync-skill-dist.mjs` to copy the skill-runtime CLIs into each publishable skill package:
+
+- `skills/freshdocs-doc-audit/dist`
+- `skills/freshdocs-update-docs/dist`
+- `skills/freshdocs-create-docs/dist`
+
+The script removes each skill's existing `dist/`, recreates it, and copies only `audit-cli.cjs` and `cli-main.cjs` from root `dist/`. This keeps the skill install path self-contained for audit and gate fallback while avoiding duplicate copies of installer-only bins (`install-commands-cli.cjs`, `install-hook-cli.cjs`) inside every action skill.
 
 ## Gotchas
 
@@ -56,3 +66,4 @@ The hook itself, once installed, resolves `doc-gate` at runtime in six tiers (PA
 - **`freshdocs-install-commands` overwrites silently.** No `--force` flag, no marker check — re-running always replaces. Intentional: command files are owned by freshdocs, not the user.
 - **Hook marker is the contract.** Detecting an existing freshdocs hook is purely string-based. A user who manually deletes the marker line will be treated as having a non-freshdocs hook on the next install attempt.
 - **`--force` does not back up.** It directly overwrites the existing hook; users who need the old hook must preserve or merge it manually first.
+- **Skill `dist/` is generated.** Edit root `src/` and rebuild; `sync-skill-dist.mjs` propagates the runtime bundles into each skill package. Root `dist/` still carries installer bins because `package.json#bin` points there.

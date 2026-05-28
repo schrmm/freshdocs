@@ -39,12 +39,22 @@ test("indexes gated docs and lists un-gated ones, with repo-relative POSIX paths
   }
 });
 
-test("ignores node_modules, dist, and .git", () => {
+test("ignores generated dependency, build, and cache directories", () => {
   const root = fixture({
     "docs/agents/real.md": "---\ncovers: [\"src/a.ts\"]\n---\nx",
     "node_modules/pkg/readme.md": "---\ncovers: [\"x\"]\n---\nx",
     "dist/out.md": "---\ncovers: [\"x\"]\n---\nx",
+    "build/out.md": "---\ncovers: [\"x\"]\n---\nx",
+    "coverage/report.md": "---\ncovers: [\"x\"]\n---\nx",
     ".git/notes.md": "---\ncovers: [\"x\"]\n---\nx",
+    ".agents/commands/x.md": "---\ncovers: [\"x\"]\n---\nx",
+    ".venv/lib/site-packages/pkg/readme.md": "---\ncovers: [\"x\"]\n---\nx",
+    "venv/lib/site-packages/pkg/readme.md": "---\ncovers: [\"x\"]\n---\nx",
+    "__pycache__/readme.md": "---\ncovers: [\"x\"]\n---\nx",
+    ".pytest_cache/readme.md": "---\ncovers: [\"x\"]\n---\nx",
+    ".mypy_cache/readme.md": "---\ncovers: [\"x\"]\n---\nx",
+    ".ruff_cache/readme.md": "---\ncovers: [\"x\"]\n---\nx",
+    ".tox/readme.md": "---\ncovers: [\"x\"]\n---\nx",
   });
   try {
     const index = buildIndex(root);

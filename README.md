@@ -1,7 +1,7 @@
 ---
 audience: human
 covers: ["src/**"]
-synced: 6308e29167a281d84dd895ed7ad7a0441ee7802b
+synced: a38d607c1ddd506aada1c1bb4b340a3b1018eead
 reviewed: 2026-05-27
 review_interval: 60d
 ---
@@ -22,11 +22,11 @@ freshdocs is a portable [Agent Skills](https://www.skills.sh) package that syste
 npx skills add schrmm/freshdocs
 ```
 
-That is the whole install path. `skills.sh` will ask which agent harness and scope to use; choose Codex when installing for Codex. The package installs three coordinated skills, each with the pre-built `dist/` CLIs included, so no global npm install is required:
+That is the whole install path. `skills.sh` will ask which agent harness and scope to use; choose Codex when installing for Codex. The package installs three coordinated skills, each with the pre-built CLIs it needs, so no global npm install is required:
 
-- `freshdocs-doc-audit`
-- `freshdocs-update-docs`
-- `freshdocs-create-docs`
+- **[`freshdocs-doc-audit`](./skills/freshdocs-doc-audit/SKILL.md)** — run the read-only documentation health audit.
+- **[`freshdocs-update-docs`](./skills/freshdocs-update-docs/SKILL.md)** — repair existing docs flagged by the gate or audit.
+- **[`freshdocs-create-docs`](./skills/freshdocs-create-docs/SKILL.md)** — author missing coverage docs for uncovered or wildcard-only source areas.
 
 In Codex, freshdocs appears as selectable skills, not as slash commands. Start a new Codex session if it was installed while Codex was already running, then use `/skills` or invoke `$freshdocs-doc-audit`, `$freshdocs-update-docs`, or `$freshdocs-create-docs`.
 
@@ -55,7 +55,7 @@ freshdocs-install-commands --claude
 
 Codex does not load arbitrary third-party slash commands from those templates. The `/freshdocs:doc-audit`, `/freshdocs:update-docs`, and `/freshdocs:create-docs` templates are adapters for hosts that support Markdown command templates, such as Claude Code. In Codex, use `/skills` or mention the corresponding skill by name; restart Codex or start a new session if the skills were installed while Codex was already running.
 
-The hook itself resolves `doc-gate` at runtime in this order: PATH → `node_modules/.bin/` → project `.agents/skills/freshdocs-update-docs/dist/cli-main.cjs` → global `~/.codex/skills/freshdocs-update-docs/dist/cli-main.cjs` → global `~/.agents/skills/freshdocs-update-docs/dist/cli-main.cjs` → legacy `freshdocs` skill dist in project, Codex global, or portable global locations via `node`. The first one that exists wins.
+The hook itself resolves `doc-gate` at runtime in this order: PATH → `node_modules/.bin/` → project `.agents/skills/freshdocs-update-docs/dist/cli-main.cjs` → global `~/.codex/skills/freshdocs-update-docs/dist/cli-main.cjs` → global `~/.agents/skills/freshdocs-update-docs/dist/cli-main.cjs`. The first one that exists wins.
 
 ## What it detects
 
@@ -146,13 +146,23 @@ freshdocs-audit --init --apply   # write conservative docmeta to un-annotated do
 
 ## Slash commands
 
-`commands/` ships three adapter templates for Claude Code (and any host with `.md` command templates). They are also mirrored under `.agents/commands/freshdocs` for agent-neutral consumers:
+`commands/` ships three adapter templates for Claude Code (and any host with `.md` command templates). `freshdocs-install-commands` installs those templates into the user's agent command directory:
 
 - **`/freshdocs:doc-audit`** — invokes `freshdocs-doc-audit`.
 - **`/freshdocs:update-docs`** — invokes `freshdocs-update-docs`.
 - **`/freshdocs:create-docs`** — invokes `freshdocs-create-docs`.
 
 The skills themselves are the judgment layer. They are automatically loaded by hosts that follow the Agent Skills standard when matching their descriptions.
+
+## Skills reference
+
+The public skill surface is intentionally small and action-oriented, following the Matt Pocock-style repo pattern of one installable repository with independently selectable skills:
+
+- **[`freshdocs-doc-audit`](./skills/freshdocs-doc-audit/SKILL.md)** — read-only audit for coverage gaps, overdue reviews, broken internal links, and external URL health.
+- **[`freshdocs-update-docs`](./skills/freshdocs-update-docs/SKILL.md)** — reconcile drift, broken links, macro staleness, overdue reviews, and external-link findings surfaced by the gate or audit.
+- **[`freshdocs-create-docs`](./skills/freshdocs-create-docs/SKILL.md)** — create new docs for uncovered or wildcard-only source areas after clustering files and getting user approval.
+
+See [`skills/README.md`](./skills/README.md) for the package-local catalog. Harness-specific slash commands are adapters only; the `SKILL.md` files above are the canonical agent instructions.
 
 ## What freshdocs replaces — and what it doesn't
 
@@ -186,11 +196,11 @@ Core modules behind thin CLIs:
 
 Plus pure helpers (`bump-frontmatter`, `write-frontmatter`, `init-docmeta`). 85 behavior-only tests.
 
-Shared repo-shape defaults live in `repo-policy`: ignored directories (`node_modules`, `dist`, `.git`, `.agents`) and the conventional code-surface prefixes (`src/`, `lib/`, `app/`, `packages/`). There is no required config file in v1; those defaults are deliberately boring and hardcoded.
+Shared repo-shape defaults live in `repo-policy`: ignored dependency/build/cache directories, generated bytecode suffixes, and the conventional code-surface prefixes (`src/`, `lib/`, `app/`, `packages/`, `scripts/`). There is no required config file in v1; those defaults are deliberately boring and hardcoded.
 
 Publishable skill packages live under `skills/freshdocs-*`, following the Matt Pocock-style source layout. Installed skills land under the target harness's active skill directory such as `.agents/skills` or `~/.agents/skills`; the source repo does not track publishable skills under its own `.agents/skills`, so Codex does not double-load them while developing freshdocs.
 
-See `docs/specs/2026-05-22-freshdocs-design.md` for the full design rationale, and the issue tracker for the seven implementation slices that built it.
+See the issue tracker and PRDs for the design rationale and implementation slices that built it.
 
 ## License
 

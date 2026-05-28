@@ -2,7 +2,7 @@ import { parse as parseYaml } from "yaml";
 import { readdirSync, readFileSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { inferAudience, type Audience } from "./audience.ts";
-import { IGNORED_DIRS } from "./repo-policy.ts";
+import { IGNORED_DIRS, isIgnoredFile } from "./repo-policy.ts";
 
 export type { Audience } from "./audience.ts";
 
@@ -80,7 +80,7 @@ function* walkMarkdown(root: string, dir: string): Generator<string> {
     if (dirent.isDirectory()) {
       if (IGNORED_DIRS.has(dirent.name)) continue;
       yield* walkMarkdown(root, join(dir, dirent.name));
-    } else if (dirent.isFile() && dirent.name.endsWith(".md")) {
+    } else if (dirent.isFile() && !isIgnoredFile(dirent.name) && dirent.name.endsWith(".md")) {
       yield join(dir, dirent.name);
     }
   }

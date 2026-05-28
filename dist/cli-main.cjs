@@ -9131,8 +9131,30 @@ function inferAudience(relPath) {
 }
 
 // src/repo-policy.ts
-var IGNORED_DIRS = /* @__PURE__ */ new Set(["node_modules", "dist", ".git", ".agents"]);
-var DEFAULT_CODE_PREFIXES = ["src/", "lib/", "app/", "packages/"];
+var IGNORED_DIRS = /* @__PURE__ */ new Set([
+  "node_modules",
+  "dist",
+  "build",
+  "coverage",
+  ".git",
+  ".agents",
+  ".venv",
+  "venv",
+  "__pycache__",
+  ".pytest_cache",
+  ".mypy_cache",
+  ".ruff_cache",
+  ".tox"
+]);
+var IGNORED_FILE_SUFFIXES = [
+  ".pyc",
+  ".pyo",
+  ".pyd"
+];
+function isIgnoredFile(name) {
+  return IGNORED_FILE_SUFFIXES.some((suffix) => name.endsWith(suffix));
+}
+var DEFAULT_CODE_PREFIXES = ["src/", "lib/", "app/", "packages/", "scripts/"];
 
 // src/docmeta-index.ts
 var FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---/;
@@ -9173,7 +9195,7 @@ function* walkMarkdown(root, dir) {
     if (dirent.isDirectory()) {
       if (IGNORED_DIRS.has(dirent.name)) continue;
       yield* walkMarkdown(root, (0, import_node_path.join)(dir, dirent.name));
-    } else if (dirent.isFile() && dirent.name.endsWith(".md")) {
+    } else if (dirent.isFile() && !isIgnoredFile(dirent.name) && dirent.name.endsWith(".md")) {
       yield (0, import_node_path.join)(dir, dirent.name);
     }
   }
@@ -9337,7 +9359,7 @@ function listFiles(repoRoot) {
     for (const dirent of (0, import_node_fs2.readdirSync)(dir, { withFileTypes: true })) {
       if (dirent.isDirectory()) {
         if (!IGNORED_DIRS.has(dirent.name)) walk((0, import_node_path3.join)(dir, dirent.name));
-      } else if (dirent.isFile()) {
+      } else if (dirent.isFile() && !isIgnoredFile(dirent.name)) {
         const rel = (0, import_node_path3.join)(dir, dirent.name).slice(repoRoot.length + 1).split(import_node_path3.sep).join("/");
         files.add(rel);
       }
