@@ -1,8 +1,8 @@
 ---
 audience: agent
 covers: ["src/audience.ts", "src/docmeta-index.ts", "src/init-docmeta.ts", "src/write-frontmatter.ts", "src/repo-files.ts", "src/repo-policy.ts"]
-synced: a38d607c1ddd506aada1c1bb4b340a3b1018eead
-reviewed: 2026-05-27
+synced: 4b938fb8baadb323dd016c1fc11535be1a2aa48d
+reviewed: 2026-06-01
 review_interval: 30d
 ---
 
@@ -72,8 +72,8 @@ interface FrontmatterInit { audience: Audience; covers: string[]; synced?: strin
 function writeFrontmatter(content: string, init: FrontmatterInit): string;
 ```
 
-- If the content already starts with `---\n`, returns it unchanged. Repair of *existing* frontmatter is `bumpFrontmatter`'s job — this writer never edits in place.
-- Emits `covers` as a stable inline array: `["a", "b"]`. Quotes are JSON-escaped (`"` → `\"`).
+- If the content already starts with a frontmatter fence (`---` plus LF or CRLF), returns it unchanged. Repair of *existing* frontmatter is `bumpFrontmatter`'s job — this writer never edits in place.
+- Emits `covers` as a stable inline array: `["a", "b"]`. Double quotes in cover values are escaped (`"` → `\"`).
 - Optional fields are omitted when undefined; `reviewInterval` is written as `review_interval:` (snake_case in YAML, camelCase in TS).
 - Output is `---\n<lines>\n---\n\n<original>`.
 
@@ -117,7 +117,7 @@ function listFiles(repoRoot: string): Set<string>;
 
 Uses the same shared ignore policy as `docmeta-index.ts`, but keeps a separate traversal because the walkers have different goals: `docmeta-index.ts` indexes markdown docs and parses `docmeta`, while `repo-files.ts` enumerates the whole repo file surface for coverage, link checks, and macro shape.
 
-Consumers: `coverage.ts` (the code surface), gate composition (resolving "files that exist in repo" for link checks), audit (surface enumeration).
+Consumers: gate composition and audit call `listFiles` directly. Audit derives the default code surface from that set before passing paths to `coverageOf`.
 
 ## Gotchas
 

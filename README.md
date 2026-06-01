@@ -1,8 +1,8 @@
 ---
 audience: human
 covers: ["src/**"]
-synced: 1e92231fd9e42311d6ae639fff6857d93e402e7e
-reviewed: 2026-05-28
+synced: 4b938fb8baadb323dd016c1fc11535be1a2aa48d
+reviewed: 2026-06-01
 review_interval: 60d
 ---
 
@@ -31,7 +31,7 @@ That is the whole skill install path. `skills.sh` discovers the freshdocs skill 
 
 In Codex, freshdocs appears as selectable skills, not as slash commands. Start a new Codex session if it was installed while Codex was already running, then use `/skills` or invoke `$freshdocs-doc-audit`, `$freshdocs-update-docs`, `$freshdocs-create-docs`, or `$freshdocs-install-hook`.
 
-Optional: install as an npm package only if you want `doc-gate` and `freshdocs-audit` directly on PATH everywhere:
+Optional: install as an npm package only if you want `doc-gate`, `freshdocs-audit`, or installer bins directly on PATH everywhere:
 
 ```sh
 npm install -g github:schrmm/freshdocs
@@ -39,7 +39,7 @@ npm install -g github:schrmm/freshdocs
 
 ### Wire it up
 
-Optional wiring helpers; run from inside the target repo:
+Optional wiring helpers:
 
 ```sh
 # Install the pre-commit gate into this repo's .git/hooks/:
@@ -54,7 +54,7 @@ freshdocs-install-commands
 freshdocs-install-commands --claude
 ```
 
-The `freshdocs-install-hook` skill and bin refuse to clobber a non-freshdocs `pre-commit` hook; pass `--force` only after deciding to overwrite. `freshdocs-install-commands` installs the agent-neutral command templates by default; pass `--claude` only when you want the Claude Code slash-command adapter. Both bins resolve their source files (`hooks/pre-commit`, `commands/*.md`) from wherever freshdocs is installed — works for both `npx skills@latest add schrmm/freshdocs` and `npm i -g github:` layouts.
+The `freshdocs-install-hook` skill and bin refuse to clobber a non-freshdocs `pre-commit` hook; pass `--force` only after deciding to overwrite. Run hook setup from the target repo. `freshdocs-install-commands` installs command templates into the user's home directory and does not depend on repo cwd; pass `--claude` only when you want the Claude Code slash-command adapter. Command-template installation is currently an npm-package bin path, while hook setup is available as both a skill and bin.
 
 Codex does not load arbitrary third-party slash commands from those templates. The `/freshdocs:doc-audit`, `/freshdocs:update-docs`, and `/freshdocs:create-docs` templates are adapters for hosts that support Markdown command templates, such as Claude Code. In Codex, use `/skills` or mention the corresponding skill by name; restart Codex or start a new session if the skills were installed while Codex was already running.
 

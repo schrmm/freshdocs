@@ -1,8 +1,8 @@
 ---
 audience: agent
 covers: ["src/reporter.ts"]
-synced: b99a2f4d417555178bb8c1f0652d052e4dcc46dc
-reviewed: 2026-05-26
+synced: 4b938fb8baadb323dd016c1fc11535be1a2aa48d
+reviewed: 2026-06-01
 review_interval: 30d
 ---
 
@@ -48,7 +48,7 @@ Exit code:
 note: 4 un-gated docs have no docmeta — run freshdocs-audit --init to bootstrap.
 ```
 
-Appended *after* the headline (clean case) or *after* the findings list (issues case). Singular/plural toggle on the count (`1` → "doc has", others → "docs have").
+Appended *after* the headline (clean case) or *after* the findings list (issues case). The noun toggles on the count (`1` → "doc", others → "docs"); the message currently uses "have" for both.
 
 `ungatedCount` of `undefined`, `0`, or omitted → no nudge.
 

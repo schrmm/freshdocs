@@ -2,8 +2,8 @@
 description: Run the read-only freshdocs audit and report documentation health (coverage, overdue reviews, broken internal links, external link health). Makes no changes.
 audience: agent
 covers: ["src/audit-cli.ts", "src/audit.ts", "src/coverage.ts"]
-synced: a38d607c1ddd506aada1c1bb4b340a3b1018eead
-reviewed: 2026-05-27
+synced: 4b938fb8baadb323dd016c1fc11535be1a2aa48d
+reviewed: 2026-06-01
 review_interval: 30d
 ---
 
@@ -15,7 +15,7 @@ Use the `freshdocs-doc-audit` skill to run the documentation health audit for th
    - `node .agents/skills/freshdocs-doc-audit/dist/audit-cli.cjs` (project skill install), OR
    - `node ~/.codex/skills/freshdocs-doc-audit/dist/audit-cli.cjs` (Codex global skill install), OR
    - `node ~/.agents/skills/freshdocs-doc-audit/dist/audit-cli.cjs` (portable global skill install).
-   It accepts no arguments and operates on the current working directory.
+   Normal audit mode operates on the current working directory. `--init` previews docmeta bootstrap proposals; `--init --apply` writes them.
 2. Present the report grouped by section:
    - **Coverage** — explicitly documented, wildcard-only, and uncovered source files.
      The default code surface uses freshdocs' shared repo policy (`src/`, `lib/`, `app/`, `packages/`, `scripts/`).

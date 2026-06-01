@@ -2,8 +2,8 @@
 description: Author missing per-module / workflow / orientation docs. Sweep mode walks all uncovered findings; targeted mode authors a specific unit. Hands off to grill-with-docs for domain-language territory.
 audience: agent
 covers: ["src/audit-cli.ts", "src/audit.ts", "src/coverage.ts", "src/detect-engine.ts"]
-synced: a38d607c1ddd506aada1c1bb4b340a3b1018eead
-reviewed: 2026-05-27
+synced: 4b938fb8baadb323dd016c1fc11535be1a2aa48d
+reviewed: 2026-06-01
 review_interval: 30d
 ---
 
@@ -16,7 +16,7 @@ Use the `freshdocs-create-docs` skill to author missing documentation for this r
    - **Argument is a source path or glob** → targeted mode for that unit; the doc location is inferred (`docs/agents/<name>.md`).
    - **Argument is a doc path** → scaffold at that path. For `docs/workflows/<name>.md` and `docs/overview.md`, scaffold a structured outline and ask the user to fill the prose.
 
-3. **Audit first.** Run `freshdocs-audit` and capture `uncovered` + `wildcardOnly` lists, plus full file paths.
+3. **Audit first.** Run `freshdocs-audit` and capture the repo-relative `uncovered` + `wildcardOnly` lists from the report. The CLI prints the first 20 paths per section; if a section is truncated, run a targeted follow-up or inspect the repo before drafting.
    - Bin resolution: try `freshdocs-audit` on PATH; fall back to `node_modules/.bin/freshdocs-audit`; then project `.agents/skills/freshdocs-create-docs/dist/audit-cli.cjs`; then global `~/.codex/skills/freshdocs-create-docs/dist/audit-cli.cjs`; then global `~/.agents/skills/freshdocs-create-docs/dist/audit-cli.cjs`.
    - The default code surface comes from freshdocs' shared repo policy (`src/`, `lib/`, `app/`, `packages/`, `scripts/`); targeted mode can still operate on an explicit source path outside that set.
 
