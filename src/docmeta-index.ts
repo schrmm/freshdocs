@@ -2,7 +2,7 @@ import { parse as parseYaml } from "yaml";
 import { readdirSync, readFileSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { inferAudience, type Audience } from "./audience.ts";
-import { IGNORED_DIRS, isIgnoredFile } from "./repo-policy.ts";
+import { IGNORED_DIRS, isDocmetaIgnoredPath, isIgnoredFile } from "./repo-policy.ts";
 
 export type { Audience } from "./audience.ts";
 
@@ -93,6 +93,7 @@ export function buildIndex(repoRoot: string): DocIndex {
 
   for (const fullPath of walkMarkdown(repoRoot, repoRoot)) {
     const relPath = relative(repoRoot, fullPath).split(sep).join("/");
+    if (isDocmetaIgnoredPath(relPath)) continue;
     const result = parseDocmeta(readFileSync(fullPath, "utf8"), relPath);
     if (result.gated) entries.push(result.entry);
     else ungated.push({ path: relPath, reason: result.reason });

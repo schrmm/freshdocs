@@ -63,3 +63,20 @@ test("ignores generated dependency, build, and cache directories", () => {
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test("ignores non-docmeta markdown surfaces", () => {
+  const root = fixture({
+    "docs/agents/real.md": "---\ncovers: [\"src/a.ts\"]\n---\nx",
+    "AGENTS.md": "# agent instructions",
+    "docs/prd/0001-plan.md": "# PRD",
+    "skills/README.md": "# skills",
+    "skills/example/SKILL.md": "---\nname: example\ndescription: x\n---\n# Skill",
+  });
+  try {
+    const index = buildIndex(root);
+    assert.deepEqual(index.entries.map((e) => e.path), ["docs/agents/real.md"]);
+    assert.deepEqual(index.ungated, []);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});

@@ -78,3 +78,19 @@ test("skips docs that already have a docmeta block", () => {
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test("does not propose docmeta for excluded markdown surfaces", () => {
+  const root = fixture({
+    "AGENTS.md": "# agent instructions",
+    "docs/prd/0001-plan.md": "# PRD",
+    "skills/README.md": "# skills",
+    "skills/example/SKILL.md": "---\nname: example\ndescription: x\n---\n# Skill",
+    "docs/guide.md": "# Guide",
+  });
+  try {
+    const { proposals } = initDocmeta(root, { dryRun: true });
+    assert.deepEqual(proposals.map((p) => p.path), ["docs/guide.md"]);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});

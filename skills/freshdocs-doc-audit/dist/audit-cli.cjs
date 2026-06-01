@@ -9150,6 +9150,16 @@ var IGNORED_FILE_SUFFIXES = [
 function isIgnoredFile(name) {
   return IGNORED_FILE_SUFFIXES.some((suffix) => name.endsWith(suffix));
 }
+var DOCMETA_IGNORED_PATHS = /* @__PURE__ */ new Set([
+  "AGENTS.md"
+]);
+var DOCMETA_IGNORED_PREFIXES = [
+  "docs/prd/",
+  "skills/"
+];
+function isDocmetaIgnoredPath(path) {
+  return DOCMETA_IGNORED_PATHS.has(path) || DOCMETA_IGNORED_PREFIXES.some((prefix) => path.startsWith(prefix));
+}
 var DEFAULT_CODE_PREFIXES = ["src/", "lib/", "app/", "packages/", "scripts/"];
 
 // src/docmeta-index.ts
@@ -9201,6 +9211,7 @@ function buildIndex(repoRoot) {
   const ungated = [];
   for (const fullPath of walkMarkdown(repoRoot, repoRoot)) {
     const relPath = (0, import_node_path.relative)(repoRoot, fullPath).split(import_node_path.sep).join("/");
+    if (isDocmetaIgnoredPath(relPath)) continue;
     const result = parseDocmeta((0, import_node_fs.readFileSync)(fullPath, "utf8"), relPath);
     if (result.gated) entries.push(result.entry);
     else ungated.push({ path: relPath, reason: result.reason });
