@@ -22,13 +22,14 @@ freshdocs is a portable [Agent Skills](https://www.skills.sh) package that syste
 npx skills@latest add schrmm/freshdocs
 ```
 
-That is the whole skill install path. `skills.sh` discovers the freshdocs skill family, asks which skills to install, then asks which agent harness and scope to use. Choose all three for the complete workflow. After the installer finishes, the selected agent has the chosen skills with the pre-built runtime CLIs they need, so no extra skill configuration or global npm install is required:
+That is the whole skill install path. `skills.sh` discovers the freshdocs skill family, asks which skills to install, then asks which agent harness and scope to use. Choose the three workflow skills for audit/repair/authoring, plus `freshdocs-install-hook` when you want hook setup from skills. After the installer finishes, the selected agent has the chosen skills with the pre-built runtime CLIs they need, so no extra skill configuration or global npm install is required:
 
 - **[`freshdocs-doc-audit`](./skills/freshdocs-doc-audit/SKILL.md)** — run the read-only documentation health audit.
 - **[`freshdocs-update-docs`](./skills/freshdocs-update-docs/SKILL.md)** — repair existing docs flagged by the gate or audit.
 - **[`freshdocs-create-docs`](./skills/freshdocs-create-docs/SKILL.md)** — author missing coverage docs for uncovered or wildcard-only source areas.
+- **[`freshdocs-install-hook`](./skills/freshdocs-install-hook/SKILL.md)** — install the optional pre-commit hook from a skills.sh install.
 
-In Codex, freshdocs appears as selectable skills, not as slash commands. Start a new Codex session if it was installed while Codex was already running, then use `/skills` or invoke `$freshdocs-doc-audit`, `$freshdocs-update-docs`, or `$freshdocs-create-docs`.
+In Codex, freshdocs appears as selectable skills, not as slash commands. Start a new Codex session if it was installed while Codex was already running, then use `/skills` or invoke `$freshdocs-doc-audit`, `$freshdocs-update-docs`, `$freshdocs-create-docs`, or `$freshdocs-install-hook`.
 
 Optional: install as an npm package only if you want `doc-gate` and `freshdocs-audit` directly on PATH everywhere:
 
@@ -38,11 +39,13 @@ npm install -g github:schrmm/freshdocs
 
 ### Wire it up
 
-Two install bins; run from inside the target repo:
+Optional wiring helpers; run from inside the target repo:
 
 ```sh
 # Install the pre-commit gate into this repo's .git/hooks/:
 freshdocs-install-hook
+
+# Or invoke the installed freshdocs-install-hook skill.
 
 # Install portable command templates into ~/.agents/commands/freshdocs/:
 freshdocs-install-commands
@@ -51,7 +54,7 @@ freshdocs-install-commands
 freshdocs-install-commands --claude
 ```
 
-`freshdocs-install-hook` refuses to clobber a non-freshdocs `pre-commit` hook; pass `--force` to override. `freshdocs-install-commands` installs the agent-neutral command templates by default; pass `--claude` only when you want the Claude Code slash-command adapter. Both bins resolve their source files (`hooks/pre-commit`, `commands/*.md`) from wherever freshdocs is installed — works for both `npx skills@latest add schrmm/freshdocs` and `npm i -g github:` layouts.
+The `freshdocs-install-hook` skill and bin refuse to clobber a non-freshdocs `pre-commit` hook; pass `--force` only after deciding to overwrite. `freshdocs-install-commands` installs the agent-neutral command templates by default; pass `--claude` only when you want the Claude Code slash-command adapter. Both bins resolve their source files (`hooks/pre-commit`, `commands/*.md`) from wherever freshdocs is installed — works for both `npx skills@latest add schrmm/freshdocs` and `npm i -g github:` layouts.
 
 Codex does not load arbitrary third-party slash commands from those templates. The `/freshdocs:doc-audit`, `/freshdocs:update-docs`, and `/freshdocs:create-docs` templates are adapters for hosts that support Markdown command templates, such as Claude Code. In Codex, use `/skills` or mention the corresponding skill by name; restart Codex or start a new session if the skills were installed while Codex was already running.
 
@@ -161,6 +164,7 @@ The public skill surface is intentionally small and action-oriented, following t
 - **[`freshdocs-doc-audit`](./skills/freshdocs-doc-audit/SKILL.md)** — read-only audit for coverage gaps, overdue reviews, broken internal links, and external URL health.
 - **[`freshdocs-update-docs`](./skills/freshdocs-update-docs/SKILL.md)** — reconcile drift, broken links, macro staleness, overdue reviews, and external-link findings surfaced by the gate or audit.
 - **[`freshdocs-create-docs`](./skills/freshdocs-create-docs/SKILL.md)** — create new docs for uncovered or wildcard-only source areas after clustering files and getting user approval.
+- **[`freshdocs-install-hook`](./skills/freshdocs-install-hook/SKILL.md)** — install the optional pre-commit hook without requiring a global npm install.
 
 See [`skills/README.md`](./skills/README.md) for the package-local catalog. Harness-specific slash commands are adapters only; the `SKILL.md` files above are the canonical agent instructions.
 

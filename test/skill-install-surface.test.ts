@@ -9,6 +9,13 @@ const expectedSkills = [
   "freshdocs-doc-audit",
   "freshdocs-update-docs",
   "freshdocs-create-docs",
+  "freshdocs-install-hook",
+];
+
+const gateRuntimeSkills = [
+  "freshdocs-doc-audit",
+  "freshdocs-update-docs",
+  "freshdocs-create-docs",
 ];
 
 test("canonical skills directory exposes the complete freshdocs skill family", () => {
@@ -81,11 +88,15 @@ test("npm pack surface contains skill runtime assets and no install targets", ()
   }>;
   const paths = new Set(packs[0]!.files.map((file) => file.path));
 
-  for (const skillName of expectedSkills) {
+  for (const skillName of gateRuntimeSkills) {
     assert.equal(paths.has(`skills/${skillName}/SKILL.md`), true);
     assert.equal(paths.has(`skills/${skillName}/dist/audit-cli.cjs`), true);
     assert.equal(paths.has(`skills/${skillName}/dist/cli-main.cjs`), true);
   }
+
+  assert.equal(paths.has("skills/freshdocs-install-hook/SKILL.md"), true);
+  assert.equal(paths.has("skills/freshdocs-install-hook/dist/install-hook-cli.cjs"), true);
+  assert.equal(paths.has("skills/freshdocs-install-hook/hooks/pre-commit"), true);
 
   for (const path of [
     "dist/audit-cli.cjs",

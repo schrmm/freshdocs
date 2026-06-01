@@ -10,6 +10,8 @@ test("sync-skill-dist copies only skill runtime bundles", () => {
   const scriptPath = join(process.cwd(), "scripts", "sync-skill-dist.mjs");
 
   mkdirSync(join(root, "dist"), { recursive: true });
+  mkdirSync(join(root, "hooks"), { recursive: true });
+  writeFileSync(join(root, "hooks", "pre-commit"), "hook");
   for (const entry of [
     "audit-cli.cjs",
     "cli-main.cjs",
@@ -38,6 +40,15 @@ test("sync-skill-dist copies only skill runtime bundles", () => {
       assert.equal(existsSync(join(skillDist, "install-commands-cli.cjs")), false);
       assert.equal(existsSync(join(skillDist, "install-hook-cli.cjs")), false);
     }
+
+    const hookSkillDist = join(root, "skills", "freshdocs-install-hook", "dist");
+    assert.equal(existsSync(join(hookSkillDist, "install-hook-cli.cjs")), true);
+    assert.equal(existsSync(join(hookSkillDist, "audit-cli.cjs")), false);
+    assert.equal(existsSync(join(hookSkillDist, "cli-main.cjs")), false);
+    assert.equal(
+      existsSync(join(root, "skills", "freshdocs-install-hook", "hooks", "pre-commit")),
+      true,
+    );
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

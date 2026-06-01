@@ -10,7 +10,7 @@ review_interval: 30d
 
 Two one-time CLI bins that wire freshdocs into the user's environment. Both are entrypoints (declared in `package.json#bin`), both resolve their source assets from `dirname(__dirname)` so they work under either install path (`npm i -g github:` or `npx skills@latest add schrmm/freshdocs`).
 
-The primary skill install remains `npx skills@latest add schrmm/freshdocs`. `skills.sh` discovers the three freshdocs skills and lets the user select which ones to install into the selected project or global agent skill directory. The bins below are optional wiring helpers for hooks and command-template adapters; they are not required for the skills to appear in the target agent.
+The primary skill install remains `npx skills@latest add schrmm/freshdocs`. `skills.sh` discovers the freshdocs skills and lets the user select which ones to install into the selected project or global agent skill directory. The `freshdocs-install-hook` skill is the skills-native hook setup path; the bins below remain optional wiring helpers for direct CLI or command-template use.
 
 ## `freshdocs-install-commands` (`src/install-commands-cli.ts`)
 
@@ -54,13 +54,14 @@ The hook itself, once installed, resolves `doc-gate` at runtime in five tiers (P
 
 ## Skill dist sync (`scripts/sync-skill-dist.mjs`)
 
-The package build writes bundled CLIs to root `dist/`, then runs `scripts/sync-skill-dist.mjs` to copy the skill-runtime CLIs into each publishable skill package:
+The package build writes bundled CLIs to root `dist/`, then runs `scripts/sync-skill-dist.mjs` to copy skill-runtime assets into each publishable skill package:
 
 - `skills/freshdocs-doc-audit/dist`
 - `skills/freshdocs-update-docs/dist`
 - `skills/freshdocs-create-docs/dist`
+- `skills/freshdocs-install-hook/dist` plus `skills/freshdocs-install-hook/hooks/pre-commit`
 
-The script removes each skill's existing `dist/`, recreates it, and copies only `audit-cli.cjs` and `cli-main.cjs` from root `dist/`. This keeps the skill install path self-contained for audit and gate fallback while avoiding duplicate copies of installer-only bins (`install-commands-cli.cjs`, `install-hook-cli.cjs`) inside every action skill.
+The script removes each skill's existing `dist/`, recreates it, and copies only the runtime files that skill needs. Audit/update/create receive `audit-cli.cjs` and `cli-main.cjs`; install-hook receives `install-hook-cli.cjs` and the hook template. This keeps the skill install path self-contained while avoiding duplicate copies of installer-only bins inside every action skill.
 
 ## Gotchas
 

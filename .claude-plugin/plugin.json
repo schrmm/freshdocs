@@ -3,6 +3,7 @@
   "skills": [
     "./skills/freshdocs-doc-audit",
     "./skills/freshdocs-update-docs",
-    "./skills/freshdocs-create-docs"
+    "./skills/freshdocs-create-docs",
+    "./skills/freshdocs-install-hook"
   ]
 }

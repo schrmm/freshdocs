@@ -1,0 +1,4 @@
+interface:
+  display_name: "freshdocs install-hook"
+  short_description: "Install the optional freshdocs pre-commit hook."
+  default_prompt: "Install the freshdocs pre-commit hook for this repo."

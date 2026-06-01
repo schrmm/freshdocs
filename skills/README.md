@@ -7,5 +7,6 @@ That command lets `skills.sh` discover these skills and prompt for which ones to
 - **[freshdocs-doc-audit](./freshdocs-doc-audit/SKILL.md)** — Run the read-only documentation health audit and report coverage, reviews, internal links, and external link status.
 - **[freshdocs-update-docs](./freshdocs-update-docs/SKILL.md)** — Repair existing documentation findings from `doc-gate` or `freshdocs-audit` without authoring new coverage docs from scratch.
 - **[freshdocs-create-docs](./freshdocs-create-docs/SKILL.md)** — Author missing documentation for uncovered or wildcard-only source areas using a cluster-and-approve workflow.
+- **[freshdocs-install-hook](./freshdocs-install-hook/SKILL.md)** — Install the optional pre-commit hook from a skills.sh install.
 
 The source repo keeps these publishable skills under top-level `skills/`, not under `.agents/skills/`, so local checkouts do not create duplicate selectable skills in agents that scan project-local install directories.
