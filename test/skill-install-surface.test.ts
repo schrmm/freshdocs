@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parse } from "yaml";
@@ -59,4 +60,47 @@ test("npm package includes canonical skills and optional adapter assets", () => 
   assert.equal(packageJson.files.includes("skills"), true);
   assert.equal(packageJson.files.includes(".claude-plugin"), true);
   assert.equal(packageJson.files.includes(".agents"), false);
+});
+
+test("npm pack surface contains skill runtime assets and no install targets", () => {
+  const npmPackArgs = ["pack", "--dry-run", "--json", "--ignore-scripts"];
+  const npmExecPath = process.env.npm_execpath;
+  const result = npmExecPath
+    ? spawnSync(process.execPath, [npmExecPath, ...npmPackArgs], {
+        cwd: process.cwd(),
+        encoding: "utf8",
+      })
+    : spawnSync("npm", npmPackArgs, {
+        cwd: process.cwd(),
+        encoding: "utf8",
+      });
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+
+  const packs = JSON.parse(result.stdout) as Array<{
+    files: Array<{ path: string }>;
+  }>;
+  const paths = new Set(packs[0]!.files.map((file) => file.path));
+
+  for (const skillName of expectedSkills) {
+    assert.equal(paths.has(`skills/${skillName}/SKILL.md`), true);
+    assert.equal(paths.has(`skills/${skillName}/dist/audit-cli.cjs`), true);
+    assert.equal(paths.has(`skills/${skillName}/dist/cli-main.cjs`), true);
+  }
+
+  for (const path of [
+    "dist/audit-cli.cjs",
+    "dist/cli-main.cjs",
+    "dist/install-commands-cli.cjs",
+    "dist/install-hook-cli.cjs",
+    "commands/doc-audit.md",
+    "commands/update-docs.md",
+    "commands/create-docs.md",
+    "hooks/pre-commit",
+  ]) {
+    assert.equal(paths.has(path), true, `${path} must be packed`);
+  }
+
+  for (const path of paths) {
+    assert.equal(path.startsWith(".agents/"), false, `${path} must not be packed`);
+  }
 });
