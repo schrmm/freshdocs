@@ -8,9 +8,9 @@ review_interval: 30d
 
 # Install bins
 
-Two one-time CLI bins that wire freshdocs into the user's environment. Both are entrypoints (declared in `package.json#bin`), both resolve their source assets from `dirname(__dirname)` so they work under either install path (`npm i -g github:` or `npx skills@latest add schrmm/freshdocs --skill '*'`).
+Two one-time CLI bins that wire freshdocs into the user's environment. Both are entrypoints (declared in `package.json#bin`), both resolve their source assets from `dirname(__dirname)` so they work under either install path (`npm i -g github:` or `npx skills@latest add schrmm/freshdocs`).
 
-The primary skill install remains `npx skills@latest add schrmm/freshdocs --skill '*'`. That installs all three freshdocs skills into the user-selected project or global agent skill directory with no additional skill configuration. The bins below are optional wiring helpers for hooks and command-template adapters; they are not required for the three skills to appear in the target agent.
+The primary skill install remains `npx skills@latest add schrmm/freshdocs`. `skills.sh` discovers the three freshdocs skills and lets the user select which ones to install into the selected project or global agent skill directory. The bins below are optional wiring helpers for hooks and command-template adapters; they are not required for the skills to appear in the target agent.
 
 ## `freshdocs-install-commands` (`src/install-commands-cli.ts`)
 
