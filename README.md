@@ -1,8 +1,8 @@
 ---
 audience: human
 covers: ["src/**"]
-synced: a38d607c1ddd506aada1c1bb4b340a3b1018eead
-reviewed: 2026-05-27
+synced: 1e92231fd9e42311d6ae639fff6857d93e402e7e
+reviewed: 2026-05-28
 review_interval: 60d
 ---
 
@@ -19,10 +19,10 @@ freshdocs is a portable [Agent Skills](https://www.skills.sh) package that syste
 ## Install
 
 ```sh
-npx skills add schrmm/freshdocs
+npx skills@latest add schrmm/freshdocs --skill '*'
 ```
 
-That is the whole install path. `skills.sh` will ask which agent harness and scope to use; choose Codex when installing for Codex. The package installs three coordinated skills, each with the pre-built CLIs it needs, so no global npm install is required:
+That is the whole skill install path. `--skill '*'` installs the full freshdocs skill family instead of asking the user to pick individual skills. `skills.sh` will still ask which agent harness and scope to use; choose Codex when installing for Codex, and choose project or global scope depending on where you want the skills available. After the installer finishes, the selected agent has all three coordinated skills with the pre-built runtime CLIs they need, so no extra skill configuration or global npm install is required:
 
 - **[`freshdocs-doc-audit`](./skills/freshdocs-doc-audit/SKILL.md)** — run the read-only documentation health audit.
 - **[`freshdocs-update-docs`](./skills/freshdocs-update-docs/SKILL.md)** — repair existing docs flagged by the gate or audit.
@@ -51,7 +51,7 @@ freshdocs-install-commands
 freshdocs-install-commands --claude
 ```
 
-`freshdocs-install-hook` refuses to clobber a non-freshdocs `pre-commit` hook; pass `--force` to override. `freshdocs-install-commands` installs the agent-neutral command templates by default; pass `--claude` only when you want the Claude Code slash-command adapter. Both bins resolve their source files (`hooks/pre-commit`, `commands/*.md`) from wherever freshdocs is installed — works for both `npx skills add` and `npm i -g github:` layouts.
+`freshdocs-install-hook` refuses to clobber a non-freshdocs `pre-commit` hook; pass `--force` to override. `freshdocs-install-commands` installs the agent-neutral command templates by default; pass `--claude` only when you want the Claude Code slash-command adapter. Both bins resolve their source files (`hooks/pre-commit`, `commands/*.md`) from wherever freshdocs is installed — works for both `npx skills@latest add schrmm/freshdocs --skill '*'` and `npm i -g github:` layouts.
 
 Codex does not load arbitrary third-party slash commands from those templates. The `/freshdocs:doc-audit`, `/freshdocs:update-docs`, and `/freshdocs:create-docs` templates are adapters for hosts that support Markdown command templates, such as Claude Code. In Codex, use `/skills` or mention the corresponding skill by name; restart Codex or start a new session if the skills were installed while Codex was already running.
 
@@ -76,7 +76,7 @@ Agent-facing docs (`docs/agents/**`, `CLAUDE.md`, `AGENTS.md`, `CONTEXT.md`) **f
 ### A. Onboarding sweep (primary entry, fresh repo)
 
 ```
-1. npx skills add schrmm/freshdocs
+1. npx skills@latest add schrmm/freshdocs --skill '*'
 2. freshdocs-install-commands             # one-time, global command templates
 3. freshdocs-install-hook                 # per-repo, wire pre-commit
 4. freshdocs-audit --init --apply         # bootstrap empty docmeta blocks
@@ -178,7 +178,7 @@ See [`skills/README.md`](./skills/README.md) for the package-local catalog. Harn
 
 ### Migration in one go
 
-1. `npx skills add schrmm/freshdocs` in each repo (or globally per host).
+1. `npx skills@latest add schrmm/freshdocs --skill '*'` in each repo (or globally per host).
 2. Uninstall / archive the four replaced skills/commands.
 3. Run `freshdocs-audit --init --apply` to bootstrap `docmeta` on existing docs.
 4. Run `freshdocs-install-hook` (per repo) and `freshdocs-install-commands` (once per host).

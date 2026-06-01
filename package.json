@@ -10,6 +10,7 @@
     "freshdocs-install-hook": "dist/install-hook-cli.cjs"
   },
   "files": [
+    ".claude-plugin",
     "AGENTS.md",
     "dist",
     "skills",
